@@ -481,7 +481,7 @@ function saveRow(){
   audit.unshift({action:'agregado',time:new Date().toISOString(),mode,rec:{fecha:rec.fecha,cliente:rec.cliente||rec.destinatario,material:rec.material,tipo:rec.tipo,kg:rec.kg}});saveAudit();
   recordLearn(rec);updKpis();
   toast('Guardado · '+(rec.tipo||rec.material));
-  clearLineFields();sendRec(rec);
+  clearAll();sendRec(rec);
 }
 
 function renderRecs(){
