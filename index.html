@@ -250,6 +250,8 @@ const EXP_SALIDA={H:['TIPO GESTIÓN','PLANTA','FECHA','MES','RUT','DESTINATARIO'
 
 const $=id=>document.getElementById(id);
 window.onerror=function(m){try{const w=document.getElementById('warnBar');if(w){w.innerHTML='<div class="w-row w-err">⚠ Error: '+m+'</div>';w.classList.add('show');}}catch(e){}};
+const LS={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
+function loadJSON(k,def){try{const v=LS.get(k);return v?JSON.parse(v):def;}catch(e){return def;}}
 let mode='ingreso',cols=ICOLS;
 let store={ingreso:[],salida:[]};
 let learn={p2c:{},c2t:{},ranges:{}};
@@ -263,15 +265,15 @@ function num(v){if(v==null)return NaN;v=String(v).trim().replace(',','.');return
 function esc(s){return (s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
 function fmt(v){const n=Number(v);return isNaN(n)?(v||'—'):n.toLocaleString('es-CL',{maximumFractionDigits:3});}
 
-(async function init(){
+function init(){
   fillList('dl_cliente',Object.keys(CONFIG.clientes));fillList('dl_destinatario',Object.keys(CONFIG.destinatarios));
   fillList('dl_transportista',Object.keys(CONFIG.transporte));fillList('dl_generador',CONFIG.generadores);
   fillList('dl_tipo',Object.keys(CONFIG.tipo_to_material));
   document.querySelectorAll('#modesel button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
-  try{const a=await window.storage.get('eco_ingreso');if(a&&a.value)store.ingreso=JSON.parse(a.value);}catch(e){}
-  try{const b=await window.storage.get('eco_salida');if(b&&b.value)store.salida=JSON.parse(b.value);}catch(e){}
-  try{const l=await window.storage.get('eco_learn');if(l&&l.value)learn=Object.assign({p2c:{},c2t:{},ranges:{}},JSON.parse(l.value));}catch(e){}
-  try{const h=await window.storage.get('eco_audit');if(h&&h.value)audit=JSON.parse(h.value);}catch(e){}
+  store.ingreso=loadJSON('eco_ingreso',[]);
+  store.salida=loadJSON('eco_salida',[]);
+  learn=Object.assign({p2c:{},c2t:{},ranges:{}},loadJSON('eco_learn',{}));
+  audit=loadJSON('eco_audit',[]);
   document.body.classList.add('hide-extra');
   $('newBtn').addEventListener('click',clearAll);
   $('expBtn').addEventListener('click',exportData);
@@ -279,12 +281,12 @@ function fmt(v){const n=Number(v);return isNaN(n)?(v||'—'):n.toLocaleString('e
   $('histBtn').addEventListener('click',showHist);
   $('histX').addEventListener('click',()=>$('histModal').classList.remove('show'));
   $('histModal').addEventListener('click',e=>{if(e.target===$('histModal'))$('histModal').classList.remove('show');});
-  try{setMode('ingreso');}catch(err){const w=$('warnBar');if(w){w.innerHTML='<div class="w-row w-err">⚠ Error al iniciar: '+err.message+'</div>';w.classList.add('show');}}
+  setMode('ingreso');
   flushPending();
-})();
-async function persist(){try{await window.storage.set('eco_'+mode,JSON.stringify(recs()));}catch(e){}}
-async function saveLearn(){try{await window.storage.set('eco_learn',JSON.stringify(learn));}catch(e){}}
-async function saveAudit(){try{await window.storage.set('eco_audit',JSON.stringify(audit.slice(0,300)));}catch(e){}}
+}
+function persist(){LS.set('eco_'+mode,JSON.stringify(recs()));}
+function saveLearn(){LS.set('eco_learn',JSON.stringify(learn));}
+function saveAudit(){LS.set('eco_audit',JSON.stringify(audit.slice(0,300)));}
 
 function setMode(m){
   mode=m;cols=(m==='ingreso'?ICOLS:SCOLS);pesoAuto=true;
@@ -566,7 +568,7 @@ async function sendRec(rec){if(!CENTRAL_URL){updSync();return;}
   try{await fetch(CENTRAL_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(rec)});rec._sent=true;persist();}catch(e){rec._sent=false;}updSync();}
 async function flushPending(){if(!CENTRAL_URL){updSync();return;}
   for(const m of ['ingreso','salida'])for(const r of store[m])if(!r._sent){try{await fetch(CENTRAL_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(r)});r._sent=true;}catch(e){}}
-  try{await window.storage.set('eco_ingreso',JSON.stringify(store.ingreso));await window.storage.set('eco_salida',JSON.stringify(store.salida));}catch(e){}updSync();}
+  LS.set('eco_ingreso',JSON.stringify(store.ingreso));LS.set('eco_salida',JSON.stringify(store.salida));updSync();}
 function updSync(){const el=$('syncStat');if(!el)return;
   if(!CENTRAL_URL){el.style.display='none';return;}
   el.style.display='';
@@ -575,4 +577,6 @@ function updSync(){const el=$('syncStat');if(!el)return;
 setInterval(flushPending,20000);
 
 let tt;function toast(m){$('toastMsg').textContent=m;$('toast').classList.add('show');clearTimeout(tt);tt=setTimeout(()=>$('toast').classList.remove('show'),2000);}
+init();
+
 </script>
