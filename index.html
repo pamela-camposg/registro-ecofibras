@@ -1,536 +1,486 @@
-<!-- Consola Ecofibras · vista planilla inteligente -->
+<!-- Registro Ecofibras · entrega con múltiples líneas -->
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 :root{
   --lime:#c4f135;--lime-dk:#a9d61f;--dark:#1c2e23;--muted:#6c7670;--faint:#9aa49c;
-  --line:#d1d6cf;--line2:#e0e5dd;--bg:#eef1ec;--card:#fff;
-  --green:#2f9e5b;--green-d:#228248;--green-soft:#e6f5ed;
+  --line:#d9ded6;--line2:#e4e8e1;--bg:#eef1ec;--card:#fff;
+  --green:#2f9e5b;--green-d:#228248;--green-soft:#e6f5ed;--green-glow:rgba(47,158,91,.16);
   --amber:#d97a08;--amber-soft:#fff4dd;--red:#c0392b;--red-s:#fcecea;
-  --blue:#1a4a7a;--blue-s:#e6f0f8;
-  --hdr-bg:#2d4a3a;--hdr-fg:#fff;--hdr-bd:#1f3528;
-  --entry-inp:#fffcec;--entry-auto:#e8f1f8;
-  --row-odd:#fff;--row-even:#f7faf6;--row-hover:#edf4ea;
+  --blue:#1a4a7a;--blue-s:#e8f1f9;
   --warn-bg:#fff8e1;--warn-bd:#e8c870;--warn-fg:#7c5c00;
-  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --shadow:0 1px 2px rgba(28,36,31,.04),0 10px 30px rgba(28,36,31,.08);
 }
-*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
-body{background:var(--bg);color:var(--dark);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px}
-body.hide-extra .col-extra{display:none!important}
-
-.topbar{background:var(--lime);padding:13px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.1)}
-.wm{font-weight:800;font-size:23px;letter-spacing:-.03em;color:#16201a}.wm sup{font-size:10px;top:-10px}
-.vline{width:1px;height:26px;background:rgba(0,0,0,.22)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--dark);font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px}
+.topbar{background:var(--lime);padding:14px 22px;display:flex;align-items:center;gap:15px;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.wm{font-weight:800;font-size:24px;letter-spacing:-.03em;color:#16201a}.wm sup{font-size:10px;top:-10px;position:relative}
+.vline{width:1px;height:28px;background:rgba(0,0,0,.22)}
 .bt1{font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#16201a}
-.bt2{font-size:10.5px;font-weight:600;letter-spacing:.05em;color:#3c4a3e}
+.bt2{font-size:10.5px;font-weight:600;letter-spacing:.06em;color:#3c4a3e}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-#syncStat{font-size:11px;font-weight:700;color:#2f4538;background:rgba(0,0,0,.12);padding:5px 11px;border-radius:20px}
+#syncStat{font-size:11px;font-weight:700;color:#2f4538;background:rgba(0,0,0,.1);padding:5px 11px;border-radius:20px}
 
-.ctrls{display:flex;align-items:center;gap:9px;padding:11px 20px;background:var(--card);border-bottom:1px solid var(--line2);position:sticky;top:54px;z-index:90;flex-wrap:wrap}
-.mode-seg{display:inline-flex;background:#e3e7e0;border-radius:9px;padding:3px;gap:2px}
-.mode-seg button{border:none;background:none;font-family:inherit;font-weight:700;font-size:12.5px;color:var(--muted);padding:8px 16px;border-radius:7px;cursor:pointer;transition:.15s;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 100px}
+.ctrls{display:flex;align-items:center;gap:9px;margin-bottom:16px;flex-wrap:wrap}
+.mode-seg{display:inline-flex;background:#e3e7e0;border-radius:11px;padding:4px;gap:3px}
+.mode-seg button{border:none;background:none;font-family:inherit;font-weight:700;font-size:12.5px;color:var(--muted);padding:9px 18px;border-radius:8px;cursor:pointer;transition:.15s;letter-spacing:.03em;text-transform:uppercase}
 .mode-seg button.on[data-m="ingreso"]{background:var(--card);color:var(--green);box-shadow:var(--shadow)}
 .mode-seg button.on[data-m="salida"]{background:var(--card);color:var(--amber);box-shadow:var(--shadow)}
-.ctrl-sep{width:1px;height:22px;background:var(--line2)}
-.btn{border:none;font-family:inherit;font-weight:700;font-size:12.5px;padding:9px 15px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;letter-spacing:.02em;transition:.14s}
-.btn-new,.btn-tool{background:var(--card);color:var(--muted);border:1.5px solid var(--line2)}.btn-new:hover,.btn-tool:hover{color:var(--dark);border-color:var(--muted)}
-.btn-tool.on{background:var(--green-soft);color:var(--green-d);border-color:#bfe2cd}
-.btn-exp{background:var(--lime);color:#16201a;border:none}.btn-exp:hover{background:var(--lime-dk)}.btn-exp:disabled{background:#e3e7e0;color:var(--faint);cursor:not-allowed}
-.ctrls-right{margin-left:auto;display:flex;align-items:center;gap:9px}
-.rec-count{font-family:'JetBrains Mono';font-size:11.5px;color:var(--green);background:var(--green-soft);padding:4px 10px;border-radius:20px;font-weight:700}
+.btn{border:none;font-family:inherit;font-weight:700;font-size:12.5px;padding:10px 16px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.14s}
+.btn-tool{background:var(--card);color:var(--muted);border:1.5px solid var(--line)}.btn-tool:hover{color:var(--dark);border-color:var(--muted)}
+.btn-exp{background:var(--lime);color:#16201a}.btn-exp:hover{background:var(--lime-dk)}.btn-exp:disabled{background:#e3e7e0;color:var(--faint);cursor:not-allowed}
+.ctrl-right{margin-left:auto;display:flex;gap:9px;align-items:center}
+.rec-count{font-family:'JetBrains Mono';font-size:11.5px;color:var(--green);background:var(--green-soft);padding:4px 11px;border-radius:20px;font-weight:700}
 
-/* KPIs */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 20px;background:#f7faf6;border-bottom:1px solid var(--line2)}
-.kpi{background:var(--card);border:1px solid var(--line2);border-radius:11px;padding:11px 14px;position:relative;overflow:hidden}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}
-.kpi.k-orange::before{background:var(--amber)}.kpi.k-blue::before{background:var(--blue)}.kpi.k-purple::before{background:#8b5cf6}
+.kpi.k2::before{background:var(--amber)}.kpi.k3::before{background:var(--blue)}.kpi.k4::before{background:#8b5cf6}
 .k-l{font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
-.k-v{font-family:'JetBrains Mono';font-size:22px;font-weight:800;color:var(--green);margin-top:2px;line-height:1.1}
-.k-v.text{font-size:13px;color:var(--dark);font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.k-v.text small{font-family:'JetBrains Mono';color:var(--faint);font-weight:600;margin-left:4px;font-size:11px}
-.kpi.k-orange .k-v{color:var(--amber)}.kpi.k-blue .k-v{color:var(--blue)}.kpi.k-purple .k-v{color:#7a3fdb}
-@media(max-width:680px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.k-v{font-family:'JetBrains Mono';font-size:21px;font-weight:800;color:var(--green);margin-top:2px}
+.k-v.text{font-size:12.5px;font-family:'Plus Jakarta Sans';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--dark)}
+.k-v.text small{font-family:'JetBrains Mono';color:var(--faint);font-size:10.5px;margin-left:4px}
+.kpi.k2 .k-v{color:var(--amber)}.kpi.k3 .k-v{color:var(--blue)}.kpi.k4 .k-v{color:#7a3fdb}
+@media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
 
-/* Sugerencias */
-.suggs{display:none;align-items:center;gap:10px;padding:9px 20px;background:var(--warn-bg);border-bottom:1px solid var(--warn-bd);flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--line2);border-radius:16px;box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-h{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--line2)}
+.card-h .bar{width:4px;height:15px;border-radius:3px;background:var(--green)}
+.card-h h3{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--muted);font-weight:800;flex:1}
+.card-b{padding:18px 20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+@media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.grid{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;display:flex;gap:6px;align-items:center}
+.req-dot{width:6px;height:6px;border-radius:50%;background:#cfd6cd}.req-dot.ok{background:var(--green)}
+.auto-tag{font-size:8.5px;color:var(--blue);background:var(--blue-s);padding:2px 6px;border-radius:5px;margin-left:auto;font-weight:700;letter-spacing:.05em}
+.f input,.f select{font-family:'JetBrains Mono';font-size:13.5px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fbfcfa;color:var(--dark);width:100%;transition:.13s}
+.f input::placeholder{color:#b8bfb6}
+.f input:focus,.f select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-glow);background:#fff}
+.f input.bad{border-color:var(--red);background:var(--red-s)}
+.f input[readonly]{background:var(--blue-s);color:var(--blue);border-color:#cfe0f0;font-weight:700;cursor:default}
+.f select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236c7670' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px;cursor:pointer}
+.suggs{display:none;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 0;padding:10px 12px;background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:10px}
 .suggs.show{display:flex}
-.s-l{font-size:10px;font-weight:800;color:var(--warn-fg);text-transform:uppercase;letter-spacing:.08em}
-.s-list{display:flex;gap:6px;flex-wrap:wrap}
-.s-chip{background:var(--card);border:1.5px solid var(--warn-bd);color:var(--warn-fg);font-family:inherit;font-weight:700;font-size:11.5px;padding:5px 11px;border-radius:14px;cursor:pointer;display:flex;gap:5px;align-items:center;transition:.14s}
-.s-chip small{color:#9c7c2e;font-weight:600}
-.s-chip:hover{background:#fffaeb;border-color:#c8a83a;transform:translateY(-1px)}
+.s-l{font-size:9.5px;font-weight:800;color:var(--warn-fg);text-transform:uppercase;letter-spacing:.07em}
+.s-chip{background:var(--card);border:1.5px solid var(--warn-bd);color:var(--warn-fg);font-family:inherit;font-weight:700;font-size:11.5px;padding:5px 11px;border-radius:14px;cursor:pointer;transition:.13s}
+.s-chip small{color:#9c7c2e}
+.s-chip:hover{background:#fffaeb;transform:translateY(-1px)}
 
-/* tabla */
-.tbl-wrap{overflow-x:auto;position:relative}
-.xlt{border-collapse:collapse;width:max-content;min-width:100%;font-size:12.5px}
-.xlt thead th{background:var(--hdr-bg);color:var(--hdr-fg);padding:8px 9px;font-weight:700;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border:1px solid var(--hdr-bd);position:sticky;top:0;user-select:none}
-.xlt thead th.th-req::after{content:" *";color:var(--lime);font-size:11px}
-.col-pin{position:sticky;left:0;z-index:10}
-.xlt thead th.col-pin{z-index:20;background:var(--hdr-bg)}
-tr.entry td{background:var(--entry-inp);border:1px solid var(--line);height:36px;padding:0}
-tr.entry td.c-auto{background:var(--entry-auto);color:var(--blue);font-family:'JetBrains Mono';font-weight:700;font-size:12px;padding:0 8px;cursor:default;vertical-align:middle}
-tr.entry td.col-pin{background:var(--entry-inp);position:sticky;left:0;z-index:5}
-tr.entry td.c-err{border:2px solid var(--red)!important;background:var(--red-s)}
-.cell-inp{width:100%;height:100%;border:none;background:transparent;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:12.5px;color:var(--dark);padding:0 8px;outline:none}
-.cell-inp:focus{background:rgba(47,158,91,.08)}
-.cell-inp.mono{font-family:'JetBrains Mono';font-weight:600}
-.cell-inp.upper{text-transform:uppercase}
-.save-cell{display:flex;align-items:center;justify-content:center;height:36px}
-#saveBtn{width:30px;height:30px;border-radius:50%;border:none;background:var(--green);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.16s;font-weight:700;box-shadow:0 2px 6px rgba(47,158,91,.4)}
-#saveBtn:hover:not(:disabled){background:var(--green-d);transform:scale(1.1)}
-#saveBtn:disabled{background:#d2d6cf;cursor:not-allowed;box-shadow:none}
-tr.rec:nth-child(odd) td{background:var(--row-odd)}
-tr.rec:nth-child(even) td{background:var(--row-even)}
-tr.rec:hover td{background:var(--row-hover)}
-tr.rec td{border:1px solid var(--line2);padding:5px 9px;height:32px;font-family:'JetBrains Mono';font-size:11.5px;white-space:nowrap;color:#3a4138;vertical-align:middle}
-tr.rec td.c-del-cell{background:var(--row-odd)!important;border:none}
-tr.rec:nth-child(even) td.c-del-cell{background:var(--row-even)!important}
-tr.rec:hover td.c-del-cell{background:var(--row-hover)!important}
-tr.rec td.col-pin{background:inherit;position:sticky;left:0;font-size:10.5px;color:var(--faint);font-family:'Plus Jakarta Sans';text-align:center;width:42px;border:none;box-shadow:2px 0 6px rgba(0,0,0,.06);font-weight:700}
-tr.rec td.net{color:var(--green);font-weight:700}
-.del{color:var(--faint);cursor:pointer;border:none;background:none;font-size:14px;padding:2px 6px;border-radius:5px}.del:hover{color:var(--red);background:var(--red-s)}
-.empty-row td{text-align:center;color:var(--faint);padding:36px;font-family:'Plus Jakarta Sans';background:var(--row-odd)!important;border:1px solid var(--line2)}
+/* líneas agregadas */
+.lines-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+.lines-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);padding:7px 9px;border-bottom:1px solid var(--line2);font-weight:800}
+.lines-table td{padding:8px 9px;border-bottom:1px solid var(--line2);font-family:'JetBrains Mono';white-space:nowrap}
+.lines-table td.kg{color:var(--green);font-weight:700}
+.lines-table .del{border:none;background:none;color:var(--faint);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:5px}
+.lines-table .del:hover{color:var(--red);background:var(--red-s)}
+.lines-empty{color:var(--faint);font-size:12.5px;padding:10px 2px}
+.addline-row{display:flex;gap:10px;margin-top:14px;align-items:center;flex-wrap:wrap}
+.btn-addline{background:var(--green-soft);color:var(--green-d);border:1.5px dashed #a8d8bc;font-weight:800}
+.btn-addline:hover:not(:disabled){background:#d9efe2;border-style:solid}
+.btn-addline:disabled{opacity:.5;cursor:not-allowed}
+.line-hint{font-size:11px;color:var(--faint)}
 
-/* warn bar */
-.warn-bar{position:sticky;bottom:0;background:var(--warn-bg);border-top:1.5px solid var(--warn-bd);padding:8px 20px;font-size:12px;font-weight:700;color:var(--warn-fg);display:none;flex-direction:column;gap:3px;z-index:50;backdrop-filter:blur(4px)}
-.warn-bar.show{display:flex}
-.w-row{display:flex;gap:7px;align-items:center}
-.w-err{color:var(--red)}
-.w-dup{color:#9c4400}
+.warns{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+.w-row{font-size:12px;font-weight:700;padding:8px 12px;border-radius:9px;background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn-fg)}
+.w-row.err{background:var(--red-s);border-color:#e5b4ad;color:var(--red)}
 
-/* modal */
+.savebar{display:flex;gap:12px;align-items:center;margin-top:4px}
+.btn-save{flex:1;background:var(--green);color:#fff;font-size:14.5px;font-weight:800;padding:15px 20px;border-radius:12px;letter-spacing:.03em;text-transform:uppercase;box-shadow:0 6px 16px var(--green-glow)}
+.btn-save:hover:not(:disabled){background:var(--green-d);transform:translateY(-1px)}
+.btn-save:disabled{background:#cfd6cd;cursor:not-allowed;box-shadow:none}
+.btn-clear{background:var(--card);color:var(--muted);border:1.5px solid var(--line)}
+.btn-clear:hover{color:var(--dark)}
+
+/* registros */
+.tbl-scroll{overflow-x:auto}
+table.recs{width:100%;border-collapse:collapse;font-size:12px}
+table.recs th{text-align:left;padding:9px 11px;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);border-bottom:1px solid var(--line2);white-space:nowrap;background:#f7f9f6;font-weight:800;position:sticky;top:0}
+table.recs td{padding:9px 11px;border-bottom:1px solid var(--line2);font-family:'JetBrains Mono';white-space:nowrap;color:#41493f}
+table.recs td.kg{color:var(--green);font-weight:700}
+table.recs tr:hover td{background:#f6faf4}
+table.recs .del{border:none;background:none;color:var(--faint);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:5px}
+table.recs .del:hover{color:var(--red);background:var(--red-s)}
+.recs-empty{text-align:center;color:var(--faint);padding:28px;font-size:13px}
+
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
 .modal.show{display:flex}
-.modal-c{background:var(--card);width:100%;max-width:680px;max-height:80vh;border-radius:14px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden}
-.modal-h{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line2);font-weight:800;font-size:14px;color:var(--dark)}
-.m-x{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);line-height:1}.m-x:hover{color:var(--red)}
-.modal-b{overflow-y:auto;padding:0}
+.modal-c{background:var(--card);width:100%;max-width:640px;max-height:80vh;border-radius:14px;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.35);overflow:hidden}
+.modal-h{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;border-bottom:1px solid var(--line2);font-weight:800;font-size:14px}
+.m-x{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)}.m-x:hover{color:var(--red)}
+.modal-b{overflow-y:auto}
 .h-row{padding:10px 20px;border-bottom:1px solid var(--line2);display:flex;gap:12px;align-items:center;font-size:12px}
-.h-row:last-child{border-bottom:none}
-.h-act{font-size:9.5px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:5px;letter-spacing:.05em;min-width:65px;text-align:center}
-.h-eliminado{background:var(--red-s);color:var(--red)}
-.h-agregado{background:var(--green-soft);color:var(--green-d)}
-.h-time{color:var(--muted);font-family:'JetBrains Mono';font-size:11px;min-width:130px}
-.h-rec{font-family:'JetBrains Mono';color:#41493f;font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis}
-.h-empty{text-align:center;color:var(--faint);padding:40px;font-family:'Plus Jakarta Sans'}
+.h-act{font-size:9px;font-weight:800;text-transform:uppercase;padding:3px 8px;border-radius:5px;min-width:62px;text-align:center}
+.h-eliminado{background:var(--red-s);color:var(--red)}.h-agregado{background:var(--green-soft);color:var(--green-d)}
+.h-time{color:var(--muted);font-family:'JetBrains Mono';font-size:10.5px;min-width:120px}
+.h-rec{font-family:'JetBrains Mono';font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis}
+.h-empty{text-align:center;color:var(--faint);padding:36px}
 
-.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(90px);background:var(--green);color:#fff;padding:13px 22px;border-radius:11px;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.2);opacity:0;transition:.3s cubic-bezier(.2,.9,.3,1.3);z-index:200;display:flex;gap:8px;align-items:center}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(90px);background:var(--green);color:#fff;padding:13px 22px;border-radius:11px;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.2);opacity:0;transition:.3s cubic-bezier(.2,.9,.3,1.3);z-index:400;display:flex;gap:8px;align-items:center}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.xlt thead th.grp{font-size:10px;letter-spacing:.12em;padding:6px 9px;background:#243a2d;border-bottom:2px solid var(--hdr-bd);color:#cfe6d8}
-.xlt thead th.grp-material{background:#2f4a3e;color:#d4ece0}
-.xlt thead th.grp-extra{background:#454e48;color:#dde2dd}
-.grp-edge{border-left:2px solid #aeb6ac!important}
-.xlt thead th.grp-edge{border-left:2px solid #16261c!important}
-tr.entry td.grp-edge{border-left:2px solid #c7bd78!important}
-tr.entry td.col-pin{border-left:3px solid var(--green)}
+.hideS{display:none!important}
 </style>
 
 <div class="topbar">
   <span class="wm">ambipar<sup>&reg;</sup></span><span class="vline"></span>
-  <div><div class="bt1">Registro de Ingresos y Salidas</div><div class="bt2">Ecofibras &middot; San Joaquín</div></div>
-  <div class="tb-right"><span id="syncStat">Local</span></div>
+  <div><div class="bt1">Registro de Ingresos y Salidas</div><div class="bt2">Ecofibras &middot; San Joaqu&iacute;n</div></div>
+  <div class="tb-right"><span id="syncStat" style="display:none"></span></div>
 </div>
 
-<div class="ctrls">
-  <div class="mode-seg" id="modesel">
-    <button data-m="ingreso" class="on">▼ Ingreso</button>
-    <button data-m="salida">▲ Salida</button>
+<div class="wrap">
+  <div class="ctrls">
+    <div class="mode-seg" id="modesel">
+      <button data-m="ingreso" class="on">▼ Ingreso</button>
+      <button data-m="salida">▲ Salida</button>
+    </div>
+    <button class="btn btn-tool" id="histBtn">🕒 Historial</button>
+    <div class="ctrl-right">
+      <span class="rec-count" id="recCount">0 registros</span>
+      <button class="btn btn-exp" id="expBtn" disabled>⬇ Exportar</button>
+    </div>
   </div>
-  <span class="ctrl-sep"></span>
-  <button class="btn btn-new" id="newBtn">↺ Nueva entrega</button>
-  <button class="btn btn-tool" id="extraBtn">+ Mostrar extras</button>
-  <button class="btn btn-tool" id="histBtn">🕒 Historial</button>
-  <div class="ctrls-right">
-    <span class="rec-count" id="recCount">0 registros</span>
-    <button class="btn btn-exp" id="expBtn" disabled>⬇ Exportar</button>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k-l">Hoy · Registros</div><div class="k-v" id="kpiCount">0</div></div>
+    <div class="kpi k2"><div class="k-l">Hoy · Toneladas</div><div class="k-v" id="kpiTon">0</div></div>
+    <div class="kpi k3"><div class="k-l">Top material hoy</div><div class="k-v text" id="kpiMat">—</div></div>
+    <div class="kpi k4"><div class="k-l">Top cliente hoy</div><div class="k-v text" id="kpiCli">—</div></div>
+  </div>
+
+  <!-- DATOS DE LA ENTREGA -->
+  <div class="card">
+    <div class="card-h"><span class="bar"></span><h3 id="hdrEnt">Datos de la entrega</h3></div>
+    <div class="card-b"><div class="grid" id="entGrid"></div></div>
+  </div>
+
+  <!-- MATERIALES -->
+  <div class="card">
+    <div class="card-h"><span class="bar" style="background:var(--amber)"></span><h3>Materiales de esta entrega</h3><button class="btn btn-tool" id="extraBtn" style="padding:6px 12px;font-size:11px">+ Facturación</button></div>
+    <div class="card-b">
+      <div class="grid" id="lineGrid"></div>
+      <div class="suggs" id="suggs"><span class="s-l">💡 Frecuentes de este cliente:</span><span id="sList" style="display:flex;gap:6px;flex-wrap:wrap"></span></div>
+      <div class="warns" id="lineWarns"></div>
+      <div class="addline-row">
+        <button class="btn btn-addline" id="addLineBtn" disabled>＋ Añadir línea de residuo</button>
+        <span class="line-hint">Enter también añade la línea</span>
+      </div>
+      <div id="linesBox" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="savebar">
+    <button class="btn btn-save" id="saveBtn" disabled>Guardar entrega</button>
+    <button class="btn btn-clear" id="newBtn">↺ Limpiar todo</button>
+  </div>
+
+  <!-- REGISTROS -->
+  <div class="card" style="margin-top:18px">
+    <div class="card-h"><span class="bar" style="background:var(--blue)"></span><h3>Registros guardados</h3></div>
+    <div class="tbl-scroll"><table class="recs"><thead id="rhead"></thead><tbody id="rbody"></tbody></table></div>
   </div>
 </div>
 
-<div class="kpis">
-  <div class="kpi"><div class="k-l">Hoy · Registros</div><div class="k-v" id="kpiCount">0</div></div>
-  <div class="kpi k-orange"><div class="k-l">Hoy · Toneladas</div><div class="k-v" id="kpiTon">0</div></div>
-  <div class="kpi k-blue"><div class="k-l">Top material hoy</div><div class="k-v text" id="kpiMat">—</div></div>
-  <div class="kpi k-purple"><div class="k-l">Top cliente hoy</div><div class="k-v text" id="kpiCli">—</div></div>
-</div>
+<div class="modal" id="histModal"><div class="modal-c">
+  <div class="modal-h"><span>🕒 Historial de cambios</span><button class="m-x" id="histX">✕</button></div>
+  <div class="modal-b" id="histBody"></div>
+</div></div>
 
-<div class="suggs" id="suggs"><span class="s-l">💡 Sugerencias para este cliente:</span><div class="s-list" id="sList"></div></div>
-
-<div class="tbl-wrap">
-  <table class="xlt">
-    <thead id="thead"></thead>
-    <tbody id="entryBody"></tbody>
-    <tbody id="recBody"></tbody>
-  </table>
-</div>
-<div class="warn-bar" id="warnBar"></div>
-
-<div class="modal" id="histModal">
-  <div class="modal-c">
-    <div class="modal-h"><span>🕒 Historial de cambios</span><button class="m-x" id="histX">✕</button></div>
-    <div class="modal-b" id="histBody"></div>
-  </div>
-</div>
-
-<datalist id="dl_cliente"></datalist>
-<datalist id="dl_destinatario"></datalist>
-<datalist id="dl_transportista"></datalist>
-<datalist id="dl_generador"></datalist>
+<datalist id="dl_cliente"></datalist><datalist id="dl_destinatario"></datalist>
+<datalist id="dl_transportista"></datalist><datalist id="dl_generador"></datalist>
 <datalist id="dl_tipo"></datalist>
 
 <div class="toast" id="toast"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg><span id="toastMsg"></span></div>
 
 <script>
-const CONFIG={"movimiento": ["Ingreso", "Traslado"], "formato": ["SACAS", "FARDOS", "GRANEL", "TAMBORES", "PALLET", "TOLVA 90M3", "TOLVA 30M3", "TOLVA 20 M3", "TOLVA 10M3", "BINS", "TOLVA 12M3", "TOLVA 13M3"], "proceso": ["VALORIZACIÓN", "CDR", "RELLENO SANITARIO", "MAQUILA RESIMPLE", "COMPOSTAJE"], "gestion": ["NACIONAL", "EXTRANJERO"], "destino": ["REXIN", "INOCUA VALDIVIA", "VERTEDERO CURACO", "COSEMAR TEMUCO", "KDM LOS ANGELES", "ECOFIBRAS PUERTO MONTT", "ECOFIBRAS SAN BERNARDO", "ZEROCORP"], "familias": ["PLÁSTICOS", "CARTÓN Y PAPEL", "METALES", "MADERA", "VIDRIO", "CAUCHO", "TEXTIL", "ELECTRÓNICOS", "TIERRAS", "LODOS", "INVENTARIO OBSOLETO", "ENVASES Y EMBALAJES", "NO RECICLABLES", "CDR", "DESCARTE", "RECICLABLES", "RESIMPLE"], "generadores": ["RESIMPLE (COMUNA DE PUERTO VARAS)", "RESIMPLE (COMUNA DE PUERTO MONTT)", "ECOFIBRAS S.A (PUERTO MONTT)", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA (ARCOPRIME PUERTO MONTT)", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA (ARCOPRIME PUERTO VARAS)", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA (ARCOPRIME PARGUA)", "TRUSAL S.A (ALTO BONITO)", "TRUSAL S.A (CAICAEN)", "TRUSAL S.A (LA TABLILLA)", "TRUSAL S.A (LIMPIEZA DE PLAYA PUELO)", "TRUSAL S.A (OPERACIONES)", "TRUSAL S.A (PISCULTURA LAS ARAUCARIAS)", "BIOMAR CHILE S.A (DALCAHUE)", "BIOMAR CHILE S.A (ERCILLA)", "BIOMAR CHILE S.A (PARGUA)", "MOWI CHILE S.A (CAICAEN)", "MOWI CHILE S.A (CENTRO CALABOZO)", "MOWI CHILE S.A (CENTRO COPIHUE)", "MOWI CHILE S.A (CENTRO PULELO)", "MOWI CHILE S.A (CENTRO TEUPA)", "MOWI CHILE S.A (CENTRO TRAINEL)", "MOWI CHILE S.A (CHINQUIHUE PLANTA)", "MOWI CHILE S.A (CHINQUIHUE PUNTO LIMPIO)", "MOWI CHILE S.A (DOMEYKO)", "MOWI CHILE S.A (PISCICULTURA COPIHUE)", "MOWI CHILE S.A (RAUCO)", "EMPRESAS AQUACHILE S.A (CARDONAL)", "EMPRESAS AQUACHILE S.A (TEMPAX)", "EMPRESAS AQUACHILE S.A (CALBUCO)", "EMPRESAS AQUACHILE S.A (QUELLÓN)", "CONSTRUCTORA NOVAL LTDA (OSORNO)", "CONSTRUCTORA NOVAL LTDA (PUNTO LIMPIO GRANITICA)", "SEMILLAS SZ SOCIEDAD ANONIMA (CAMPO LIMPIO)", "PESQUERA DEL MAR ANTARTICO S.A", "SALMONES DE CHILE ( GESTION AMBIENTE )", "SEA GARDEN ( GESTION AMBIENTE )", "ECOFIBRAS S.A (CORONEL)", "ECOFIBRAS S.A (SAN BERNARDO)", "TRULY NOLEN CHILE S.A", "ABICK S.A", "MANANTIAL S.A", "SURPROCESO S.A", "COMERCIAL Y SERVICIOS SUR AUSTRAL LTDA", "DSM-FIRMENICH", "CIA SALMONIFERA DALCAHUE LTDA", "RESIMPLE (COMUNA DE LAGO VERDE)", "PUERTO VERDE", "AQUAGESTION S.A", "CONSTRUCTORA ASFALCURA S.A", "AUSTRALIS MAR S.A", "BADINOTTI CHILE S.A", "CERMAQ CHILE S.A", "SALMONES BLUMAR S.A", "EMPRESA PORTUARIA PUERTO MONTT (EMPORMONTT)", "COMERCIALIZADORA CRANDON CHILE LTDA", "INTAC PROCESOS SPA", "PESQUERA TRANS ANTARTIC LTDA", "RECICLA LLANQUIHUE", "RECUPERACION Y RECICLAMIENTO RECIPULLI", "VITAPRO CHILE S.A", "SOC. COM. EMPRENDEDORES DEL SUR LTDA (EMPRESUR)", "GLOBALTEC SERVICIOS Y CONSTRUCCIÓN LTDA", "RESIMPLE (COMUNA DE PUERTO VERDE)", "MANANTIAL S.A (PUERTO MONTT)", "AISLAPOL S.A", "EXPORTADORA LOS FIORDOS LTDA", "MOWI CHILE S.A (HUELMO)", "TRUSAL PISCICULTURA STH", "TRUSAL( CHAMIZA )", "SOCIEDAD AGRICOLA B&G SPA (CAMPO LIMPIO)", "EMPRESUR", "DESARROLLOS CONSTRUCTIVOS AXIS S.A", "RIO DULCE S.A.", "ASOCIACION DE PRODUCTORES DE ENVASES Y EMBALAJES DE SUSTANCIAS PELIGRO", "PESQUERA TRANS ANTARTIC LTDA  (DETIF -LIUCURA)", "0", "TRUSAL S.A (CHAMIZA)", "TRUSAL S.A (CONTAO)", "TRUSAL S.A (PUELO)"], "tipo_to_material": {"BOTELLA TRANSPARENTE": "PET", "BOTELLA COLOR": "PET", "BOTELLAS FLAKE": "PET", "CLAMSHELL ENTERO": "PET", "CLAMSHELL FLAKE": "PET", "GARRAFÓN MOLIDO": "PET", "IMPRESO": "PET", "PREFORMA ENTERA": "PET", "PREFORMA MOLIDA": "PET", "REDES": "PET", "RESINA O FILTRADO": "PET", "TORTA": "PET", "ZUNCHO PET": "PET", "BANDEJA NEGRA": "PET", "ROLLO PLÁSTICO DESDE VIÑA SANTA RITA": "PET", "BANDEJAS ENTERAS": "PEAD - HDPE", "BANDEJAS TRITURADAS": "PEAD - HDPE", "FLOTADORES ENTEROS": "PEAD - HDPE", "FLOTADORES TRITURADOS": "PEAD - HDPE", "BALDES ENTEROS": "PEAD - HDPE", "BALDES TRITURADOS": "PEAD - HDPE", "TAPAS ENTEROS": "PEAD - HDPE", "BIDONES ENTEROS SIN PROCESAR": "PEAD - HDPE", "TAMBORES ENTEROS": "PEAD - HDPE", "BIDONES TRITURADOS": "PEAD - HDPE", "BINS": "PEAD - HDPE", "BINS TRITURADOS": "PEAD - HDPE", "BOYAS ENTERAS": "PEAD - HDPE", "BOYAS TRITURADAS": "PEAD - HDPE", "PALLETS ENTEROS": "PEAD - HDPE", "PALLETS TRITURADOS": "PEAD - HDPE", "SOPLADO ENTERO": "PEAD - HDPE", "TUBERÍAS ENTERAS": "PEAD - HDPE", "TUBERÍAS TRITURADAS": "PEAD - HDPE", "TAPAS DE GARRAFÓN ENTERAS": "PEAD - HDPE", "TAPAS DE GARRAFÓN TRITURADAS": "PEAD - HDPE", "ROTOMOLDEO TRITURADO": "PEAD - HDPE", "BOTAS": "PVC", "BLISTER": "PVC", "LAMAS": "PVC", "VENTANAS": "PVC", "TUBERÍAS": "PVC", "CÁPSULA VINO": "PVC", "FILM PESCADO": "PEBD - LDPE", "PEBD COLOR": "PEBD - LDPE", "PEBD TRANSPARENTE": "PEBD - LDPE", "MANGUERA RIEGO ENTERA": "PEBD - LDPE", "MANGUERA RIEGO TRITURADA": "PEBD - LDPE", "TAPA GARRAFÓN ENTERO": "PEBD - LDPE", "TAPA GARRAFÓN MOLIDA": "PEBD - LDPE", "STRETCH FILM": "PEBD - LLDPE", "PE EXPANDIDO": "PEBD - LLDPE", "PP RÍGIDO ENTERO": "PP", "PP RÍGIDO TRITURADO": "PP", "CABOS ENTEROS (PTO MONTT)": "PP", "CABOS TRITURADOS": "PP", "GANCHO ROPA": "PP", "FILM": "PP", "MALLA RASCHEL": "PP", "MAXISACOS": "PP", "RAFIA BLANCA": "PP", "RAFIA CARBÓN": "PP", "RAFIA CHICA": "PP", "RAFIA COLOR": "PP", "RAFIA GRIS": "PP", "RAFIA NEGRA": "PP", "RAFIA BLANCA + PEBD (BBL)": "PP", "COTONA": "PP", "CARPETA": "PP", "CARRETE MOLIDO": "PP", "CARRETE ENTERO": "PP", "ZUNCHO PP": "PP", "EPS SIN PROCESAR": "PS", "EPS TORTA": "PS", "EPS GRANEL": "PS", "EPS TORTA COLOR": "PS", "EPS TORTA NEGRO": "PS", "EPS FILTRADO": "PS", "EPS TORTA FILTRADO": "PS", "EPS ALMACIGUERA": "PS", "EPS TORTA ALMACIGUERA": "PS", "EPS TORTA ALMACIGUERA ANTIGUAS": "PS", "PAI FARDO CHICOS": "PS", "PAI FARDO": "PS", "PAI RAMAS NESTLÉ RECUPAC": "PS", "PAI FARDO NESTLÉ RECUPAC": "PS", "PAI FARDO POST CONSUMO": "PS", "PAI ESTRELLA": "PS", "PAI ESTRELLA NESTLÉ RECUPAC": "PS", "PAI RAMA": "PS", "PAI PROCESADO": "PS", "PAI CARRETE ENTERO": "PS", "PAI CARRETE MOLIDO": "PS", "CRISTAL MOLIDO": "PS", "CRISTAL ENTERO ANILLO": "PS", "PAI BANDEJAS ENTERAS": "PS", "PAI PROCESADO BANDEJAS SOPROLE": "PS", "PAI ROLLOS": "PS", "PAI ROLLOS TRITURADOS BLANCO": "PS", "PAI POST CONSUMO": "PS", "EPS BLOQUE": "PS", "GARRAFÓN ENTERO": "PC", "CD": "PC", "LAMINA": "PC", "RAMA": "PC", "TORTAS Y RAMAS": "PC", "FIBRA": "PA", "ROLLOS POLIAMIDA": "PA", "REDES NYLON": "PA", "VIRUTA": "PA", "ALARMAS": "ABS", "FARDO ABS": "ABS", "TRITURADO": "ABS", "MOLIDO": "ABS", "ENTERO": "POM - ACETAL", "RAFIA + PA FILM": "PP + PA", "CORCHO": "PEE", "CARTÓN CORRUGADO": "CARTÓN", "PUERTO MONTT (SIN PROCESAR)": "CARTÓN", "CON CERA": "CARTÓN", "ESQUINERO": "CARTÓN", "CONO TRITURADO": "CARTÓN", "CONO ENTERO SIN PROCESAR": "CARTÓN", "CONO ENTERO": "CARTÓN", "CARTÓN PARA LÍQUIDOS": "CARTÓN", "BLANCO": "PAPEL", "REVISTA": "PAPEL", "DIARIO": "PAPEL", "CHATARRA": "METALES", "HOJALATA": "METALES", "CABLES ELÉCTRICOS": "METALES", "LATAS DE AEROSOLES": "METALES", "LATAS": "ALUMINIO", "CAPSULAS VINO": "ALUMINIO + PEBD", "PALLETS BUENOS": "MADERA", "PALLETS MALOS": "MADERA", "DESPUNTES": "MADERA", "OTRAS MADERAS": "MADERA", "VIDRIO COLOR": "VIDRIOS", "VIDRIO": "VIDRIOS", "NEUMÁTICOS FUERA DE USO": "CAUCHO", "TROZOS DE CAUCHO": "CAUCHO", "CORREA TRANSPORTADORA ALMA NYLON": "CAUCHO", "CORREA TRANSPORTADORA ALMA ACERO": "CAUCHO", "RETAZOS DE CORREA TRANSPORTADORA": "CAUCHO", "ROPA": "TEXTIL", "ELECTRÓNICOS": "ELECTRÓNICOS", "PEQUEÑOS APARATOS": "ELECTRÓNICOS", "MONITORES, PANTALLAS": "ELECTRÓNICOS", "LÁMPARAS": "ELECTRÓNICOS", "PANELES FOTOVOLTAICOS": "ELECTRÓNICOS", "GRANDES APARATOS": "ELECTRÓNICOS", "APARATOS DE INTERCAMBIO DE TEMPERATURA": "ELECTRÓNICOS", "TIERRAS CONTAMINADAS": "TIERRAS", "LODOS CONTAMINADOS": "LODOS", "LODO PULPER": "LODOS", "LODO PLANTA RILES": "LODOS", "LODOS PTAS": "LODOS", "FÁRMACOS": "INVENTARIO OBSOLETO", "ALIMENTO LÁCTEO": "INVENTARIO OBSOLETO", "ALIMENTO PANADERÍA Y PASTELERÍA": "INVENTARIO OBSOLETO", "INVENTARIO": "INVENTARIO OBSOLETO", "TEXTIL": "INVENTARIO OBSOLETO", "MATERIAL CONSTRUCCIÓN": "INVENTARIO OBSOLETO", "COSMÉTICOS": "INVENTARIO OBSOLETO", "MATERIAS PRIMAS": "INVENTARIO OBSOLETO", "DECOMISOS": "INVENTARIO OBSOLETO", "TABACO": "INVENTARIO OBSOLETO", "MEZCLA DE ENVASES Y EMBALAJES": "ENVASES Y EMBALAJES", "MEZCLA DE METALES": "ENVASES Y EMBALAJES", "MEZCLA DE PAPEL Y CARTÓN": "ENVASES Y EMBALAJES", "MEZCLA DE PLÁSTICOS": "ENVASES Y EMBALAJES", "PLÁSTICOS": "NO RECICLABLES", "PAPEL Y CARTÓN": "NO RECICLABLES", "METALES": "NO RECICLABLES", "MADERA": "NO RECICLABLES", "ASIMILABLE A DOMICILIARIO": "NO RECICLABLES", "ESCOMBROS": "NO RECICLABLES", "RESIDUOS ORGÁNICOS": "RECICLABLES", "INDUSTRIAL": "NO RECICLABLES", "SÓLIDOS CONTAMINADOS": "NO RECICLABLES", "ACEITES Y LUBRICANTES USADOS": "NO RECICLABLES", "CDR": "CDR", "RESIDUOS NO VALORIZABLES": "DESCARTE", "ENVASES LIGEROS RESIMPLE": "RESIMPLE", "MIX RESIMPLE": "RESIMPLE", "PAPEL Y CARTÓN RESIMPLE": "RESIMPLE"}, "material_to_familia": {"PET": "PLÁSTICOS", "PEAD - HDPE": "PLÁSTICOS", "PVC": "PLÁSTICOS", "PEBD - LDPE": "PLÁSTICOS", "PEBD - LLDPE": "PLÁSTICOS", "PP": "PLÁSTICOS", "PS": "PLÁSTICOS", "PC": "PLÁSTICOS", "PA": "PLÁSTICOS", "ABS": "PLÁSTICOS", "POM - ACETAL": "PLÁSTICOS", "PP + PA": "PLÁSTICOS", "PEE": "PLÁSTICOS", "CARTÓN": "CARTÓN Y PAPEL", "PAPEL": "CARTÓN Y PAPEL", "METALES": "METALES", "ALUMINIO": "METALES", "ALUMINIO + PEBD": "METALES", "MADERA": "MADERA", "VIDRIOS": "VIDRIO", "CAUCHO": "CAUCHO", "TEXTIL": "TEXTIL", "ELECTRONICOS": "ELECTRÓNICOS", "TIERRAS": "TIERRAS", "LODOS": "LODOS", "INVENTARIO OBSOLETO": "INVENTARIO OBSOLETO", "ENVASES Y EMBALAJES": "ENVASES Y EMBALAJES", "NO RECICLABLES": "NO RECICLABLES", "RECICLABLES": "RECICLABLES", "CDR": "CDR", "DESCARTE": "DESCARTE", "RESIMPLE": "RESIMPLE", "COPROCESO": ""}, "clientes": {"ZERO CORP S.A": "77203549-7", "VITAPRO CHILE S.A": "96677260-3", "TRUSAL S.A": "96566740-7", "SURPROCESO S.A": "76346370-2", "SOCIEDAD LAGOSMAQ LTDA": "76016216-7", "SOCIEDAD COMERCIAL INDUSTRIAL CHILEPLAST S.A": "76256667-2", "SOCIEDAD COMERCIAL DE SERVICIOS GESTION INTEGRAL LTDA": "77757246-6", "SEA GARDEN (GESTION AMBIENTE)": "76628460-4", "SALMONES DE CHILE ( GESTION AMBIENTE )": "99520820-2", "SALMONES BLUMAR S.A": "76653690-5", "RESIMPLE": "65218304-2", "RECICLA LLANQUIHUE": "11251029-K", "PROCESADORA CALBUCO SPA": "76495180-8", "PISCICULTURA LICAN LTDA": "76024330-2", "PESQUERA Y CONSERVERA TAMAI LTDA": "87516300-0", "PESQUERA TRANS ANTARTIC LTDA": "76169670-K", "PESQUERA DEL MAR ANTARTICO S.A": "96514710-1", "PAZ RECYCLING CONSULTING SPA": "77268155-0", "PANELES Y CUBIERTAS ARRATIA SPA": "76823159-1", "NEWREST CATERING Y SERVICIOS CHILE SPA": "78544560-0", "MOWI CHILE S.A": "96633780-K", "MARINE FARMS CHILE S A": "96611190-9", "MANANTIAL S.A": "96711590-8", "INVERMAR S.A": "79797990-2", "INTAC PROCESOS SPA": "76207765-5", "INGESAT INGENIERIA Y SERVICIOS EN ALTA TENSION S.A": "78788250-1", "GRANJA MARINA TORNAGALEONES S.A": "87752000-5", "GLOBALTEC SERVICIOS Y CONSTRUCCIÓN LTDA": "76051155-2", "GESTION AMBIENTE S.A": "96929830-9", "EXPORTADORA LOS FIORDOS LTDA": "79872420-7", "EMPRESAS AQUACHILE S.A": "86247400-7", "EMPRESA PORTUARIA PUERTO MONTT": "61950900-5", "EMPRESA CONSTRUCTORA PRECON S.A": "93740000-4", "ECOFIBRAS S.A": "99545960-4", "DSM-FIRMENICH DE CHILE SPA": "78061267-3", "DESARROLLOS CONSTRUCTIVOS AXIS S.A": "79925220-1", "CERMAQ CHILE S.A": "79784980-4", "CONTROL AND MANAGEMENT SPA": "77127923-6", "CONSTRUCTORA NOVAL LTDA": "76053696-2", "CONSTRUCTORA ASFALCURA S.A": "76298660-4", "CONGELADOS Y CONSERVAS FITZ ROY S.A": "96949830-8", "COMPASS CATERING S.A": "96651910-K", "COMERCIALIZADORA CRANDON CHILE LTDA": "76029733-K", "COMERCIAL Y SERVICIOS SUR AUSTRAL LTDA": "77071440-0", "COMERCIAL TEDDY ENRIQUE DOEPKING RIOS LTDA": "76039757-1", "CIA SALMONIFERA DALCAHUE LTDA": "79777030-2", "CAMPO LIMPIO": "65228234-2", "BIOMAR CHILE S.A": "96512650-3", "BADINOTTI CHILE SPA": "96930940-8", "AUSTRALIS MAR  S.A": "76003885-7", "AQUAGESTION S.A": "99591760-2", "AISLAPOL S.A": "76412645-9", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA": "77215640-5", "ABICK S.A": "76113326-8", "CONSTUCTORA INGEVEC S.A": "89853600-9", "SOC. COM. EMPRENDEDORES DEL SUR LTDA (EMPRESUR)": "76792130-6", "BADINOTTI GROUP": "96930940-8", "RIO DLCE S.A": "96989370-3", "DSM NUTRITIONAL PRODUCTS CHILE S.A": "96959470-6", "TRUSAL S.A pisc STH": "96566740-7", "PESQUERA TRANS ANTARTIC LTDA  DETIF -LIUCURA": "76169670-K", "TRUSAL PUNTO LIMPIO ALTO BONITO": "96566740-7", "AQUACHILE": "86247400-7", "0": "0"}, "transporte": {"VICTOR ASENCIO Y CIA LTDA": {"rut": "76076829-4", "patente": "DBGR92"}, "TRUSAL S.A": {"rut": "96566740-7", "patente": "0"}, "TRULY NOLEN CHILE S A": {"rut": "96591760-8", "patente": "LKVS44"}, "TRASUR S.A": {"rut": "76222078-4", "patente": "0"}, "TRANSPORTES SANTA CLARA LTDA": {"rut": "76812847-2", "patente": "GDVH62"}, "TRANSPORTES MARIA EUFEMIA BELTRAN RIOS EIRL": {"rut": "76313844-5", "patente": "0"}, "TRANSPORTES LUIS PEÑA EIRL": {"rut": "76670048-9", "patente": "CV1756"}, "TRANSPORTES JIMENA BEATRÍZ ZEH GUARDA EIRL": {"rut": "76821342-9", "patente": "ZA8658"}, "TRANSPORTE IVAN VELASQUEZ DIAZ EIRL": {"rut": "76658039-4", "patente": "DGRF63"}, "SOCIEDAD DE TRANSPORTES FERELEC LTDA": {"rut": "77022359-8", "patente": "0"}, "SOCIEDAD AGRICOLA B&G SPA": {"rut": "77060531-8", "patente": "RJJV63"}, "SOCIEDAD COMERCIAL EMPRENDEDORES DEL SUR LTDA": {"rut": "76792130-6", "patente": "CBLZ54"}, "SERVICIOS SOTRAMAT SPA": {"rut": "77279379-0", "patente": "0"}, "SERVICIOS LUIS DANIEL PEÑA GALINDEZ EIRL": {"rut": "76988039-9", "patente": "RFHY22"}, "SEMILLAS SZ SOCIEDAD ANONIMA": {"rut": "85992100-0", "patente": "0"}, "MOWI CHILE S.A": {"rut": "96633780-K", "patente": "VHZX39"}, "SANTA LUCIA SPA": {"rut": "78069921-3", "patente": "BGXY48"}, "RODRIGO ALEJANDRO CRUZ RUBIO": {"rut": "20370118-7", "patente": "SZPP63"}, "RECUPERACION Y RECICLAMIENTO RECIPULLI": {"rut": "77186522-4", "patente": "0"}, "RECICLAJE YERKO RAMOS EIRL": {"rut": "77587755-3", "patente": "0"}, "RAMÓN JESÚS HUENUQUEO PILQUIMÁN": {"rut": "14035532-1", "patente": "GFJG46"}, "PUERTOVERDE CUIDA Y RECICLA SPA": {"rut": "77388764-0", "patente": "FHVY85"}, "PROSERVIS SPA": {"rut": "77601429-K", "patente": "0"}, "PISCICULTURA LICAN LTDA": {"rut": "76024330-2", "patente": "SJKC27"}, "PELLET PUERTO VARAS SPA": {"rut": "76507376-6", "patente": "JVCS21"}, "PAUL OWEN LÓPEZ DÍAZ": {"rut": "12169818-8", "patente": "ZB7579"}, "PABLO JOSÉ GÁLVEZ FARÍAS": {"rut": "9498297-9", "patente": "SW6620"}, "NATALI TAMARA GUZMÁN CÁCERES": {"rut": "16625388-8", "patente": "RGDR55"}, "MÓNICA ARIELA ÁLVAREZ BARRÍA": {"rut": "11251029-K", "patente": "DKDL95"}, "MARLENE ALEXIS AMPUERO GALLARDO": {"rut": "11252281-6", "patente": "BLZK38"}, "MARÍA ALEJANDRA TORRES BELLO": {"rut": "13509540-0", "patente": "TKRJ39"}, "LUIS ALBERTO PADILLA OLAVARRÍA": {"rut": "13737553-2", "patente": "SW6120"}, "KARINA NATALY RAMOS MORAGA": {"rut": "16111668-8", "patente": "KXBB66"}, "IVÁN CIPRIANO VARAS VILLANUEVA": {"rut": "13165193-7", "patente": "FKBB66"}, "HERZA SPA": {"rut": "77335164-3", "patente": "0"}, "GESTION AMBIENTE S.A": {"rut": "96929830-9", "patente": "GFZW87"}, "FELIPE MAINO ANTONIO CABEZAS HERRER": {"rut": "18669427-9", "patente": "RHSD88"}, "EMPRESA DE TRANSPORTES JOSE BOHLE E HIJO S LTDA": {"rut": "76775068-4", "patente": "ZS3170"}, "ECOFIBRAS S.A (PUERTO MONTT)": {"rut": "99545960-4", "patente": "DVHC14"}, "ECOFIBRAS S.A (CORONEL)": {"rut": "99545960-4", "patente": "0"}, "DSM-FIRMENICH DE CHILE SPA": {"rut": "78061267-3", "patente": "0"}, "DESARROLLOS CONSTRUCTIVOS AXIS": {"rut": "79925220-1", "patente": "KCRW61"}, "COSEMAR SERVICIOS INDUSTRIALES SPA": {"rut": "76214156-6", "patente": "VLRL19"}, "CAMPO LIMPIO": {"rut": "65228234-2", "patente": "HLGY46"}, "BRIDGE VENTURES SPA": {"rut": "76448760-5", "patente": "0"}, "COOPERATIVA DE TRABAJO RECICLADORES DE LA PATAGONIA LTDA": {"rut": "65256448-8", "patente": "TSPL87"}, "COMERCIAL KAUFMANN S.A": {"rut": "96572360-9", "patente": "VSDV50"}, "CHRISTIAN MARCELO VIDELA FUENTES": {"rut": "8866695-K", "patente": "GFJG56"}, "CÉSAR ANTONIO SILVA VARGAS": {"rut": "13169027-4", "patente": "PZCY58"}, "PESQUERA DEL MAR ANTARTICO S.A": {"rut": "96514710-1", "patente": "VJCV17"}, "SURPROCESO S.A": {"rut": "76346370-2", "patente": "TYHZ54"}, "AMBIPAR ENVIRONMENT CHILE LTDA": {"rut": "96824110-9", "patente": "KZWS95"}, "ALEXIS HARNOLDO OSANDÓN GALLOSO": {"rut": "14509843-2", "patente": "GHVY85"}, "ALEJANDRO JAVIER WENER HELD": {"rut": "17999953-6", "patente": "CGHK85"}, "AGRICOLA LAS ROCAS LTDA": {"rut": "76434389-1", "patente": "JXDY25"}, "ECOFIBRAS S.A (SAN BERNARDO)": {"rut": "99545960-4", "patente": "RRGB45"}, "RIO DULCE S.A.": {"rut": "96989370-3", "patente": "TYHZ54"}, "TRUSAL S.A pisc STH": {"rut": "96566740-7", "patente": "JP5278"}, "TRANSPORTE WLADYMIR SALAS": {"rut": "15107176-7", "patente": "0"}, "=_xlfn.XLOOKUP(Tabla2[[#This Row],[PATENTE]], Tabla10[PATENTE ASOCIADA], Tabla10[RAZÓN SOCIAL DE TRANSPORTE], \"No encontrado\")": {"rut": "", "patente": "0"}, "RESIMPLE": {"rut": "", "patente": "VRLR-24"}, "COMERCIALIZADORA CRANDON CHILE SPA": {"rut": "76029733-K", "patente": "CXBH63"}}, "destinatarios": {"AMBIPAR SERVICIOS DE VALORIZACION LTDA": "78874640-7", "BIOPLASTIC SPA": "77704270-K", "ECOFIBRAS S.A (SAN BERNARDO)": "99545960-4", "AMBIPAR ENVIRONMENT CHILE LTDA": "96824110-9", "FORESTAL Y PAPELERA CONCEPCION S.A": "96528420-6", "METALURGICA VIRUTEX ILKO S.A": "93550000-1", "COMERCIALIZADORA CRANDON CHILE LTDA": "76029733-K", "REUTILIZACIÓN DE ENVASES PLASTICOS LTDA": "77933902-5", "SOCIEDAD COMERCIAL INDUSTRIAL CHILEPLAST SPA": "76256667-2", "ZEROCORP SPA": "77203549-7", "PROCESADORA CALBUCO SPA": "76495180-8", "RECICLAJES CORESA SPA (RECCOR)": "77737609-8", "VIRUTEX ILKO S.A": "93550000-1", "SOCIEDAD Y COMERCIAL Y TRANSPORTE  MAQUINEX LTDA (METALEX)": "76330871-5", "RESIMPLE": "65218304-2", "COMERCIAL SPRAYLAP CHILE LTDA": "76029733-K", "CAMPO LIMPIO": "65228234-2", "ECOFIBRAS S.A (CORONEL)": "99545960-4"}, "pat2tr": {"DBGR92": "VICTOR ASENCIO Y CIA LTDA", "LKVS44": "TRULY NOLEN CHILE S A", "GDVH62": "TRANSPORTES SANTA CLARA LTDA", "CV1756": "TRANSPORTES LUIS PEÑA EIRL", "ZA8658": "TRANSPORTES JIMENA BEATRÍZ ZEH GUARDA EIRL", "DGRF63": "TRANSPORTE IVAN VELASQUEZ DIAZ EIRL", "RJJV63": "SOCIEDAD AGRICOLA B&G SPA", "CBLZ54": "SOCIEDAD COMERCIAL EMPRENDEDORES DEL SUR LTDA", "RFHY22": "SERVICIOS LUIS DANIEL PEÑA GALINDEZ EIRL", "VHZX39": "MOWI CHILE S.A", "BGXY48": "SANTA LUCIA SPA", "SZPP63": "RODRIGO ALEJANDRO CRUZ RUBIO", "GFJG46": "RAMÓN JESÚS HUENUQUEO PILQUIMÁN", "FHVY85": "PUERTOVERDE CUIDA Y RECICLA SPA", "SJKC27": "PISCICULTURA LICAN LTDA", "JVCS21": "PELLET PUERTO VARAS SPA", "ZB7579": "PAUL OWEN LÓPEZ DÍAZ", "SW6620": "PABLO JOSÉ GÁLVEZ FARÍAS", "RGDR55": "NATALI TAMARA GUZMÁN CÁCERES", "DKDL95": "MÓNICA ARIELA ÁLVAREZ BARRÍA", "BLZK38": "MARLENE ALEXIS AMPUERO GALLARDO", "TKRJ39": "MARÍA ALEJANDRA TORRES BELLO", "SW6120": "LUIS ALBERTO PADILLA OLAVARRÍA", "KXBB66": "KARINA NATALY RAMOS MORAGA", "FKBB66": "IVÁN CIPRIANO VARAS VILLANUEVA", "GFZW87": "GESTION AMBIENTE S.A", "RHSD88": "FELIPE MAINO ANTONIO CABEZAS HERRER", "ZS3170": "EMPRESA DE TRANSPORTES JOSE BOHLE E HIJO S LTDA", "DVHC14": "ECOFIBRAS S.A (PUERTO MONTT)", "KCRW61": "DESARROLLOS CONSTRUCTIVOS AXIS", "VLRL19": "COSEMAR SERVICIOS INDUSTRIALES SPA", "HLGY46": "CAMPO LIMPIO", "TSPL87": "COOPERATIVA DE TRABAJO RECICLADORES DE LA PATAGONIA LTDA", "VSDV50": "COMERCIAL KAUFMANN S.A", "GFJG56": "CHRISTIAN MARCELO VIDELA FUENTES", "PZCY58": "CÉSAR ANTONIO SILVA VARGAS", "VJCV17": "PESQUERA DEL MAR ANTARTICO S.A", "TYHZ54": "SURPROCESO S.A", "KZWS95": "AMBIPAR ENVIRONMENT CHILE LTDA", "GHVY85": "ALEXIS HARNOLDO OSANDÓN GALLOSO", "CGHK85": "ALEJANDRO JAVIER WENER HELD", "JXDY25": "AGRICOLA LAS ROCAS LTDA", "RRGB45": "ECOFIBRAS S.A (SAN BERNARDO)", "JP5278": "TRUSAL S.A pisc STH", "VRLR-24": "RESIMPLE", "CXBH63": "COMERCIALIZADORA CRANDON CHILE SPA"}, "plantas": ["San Joaquín"], "tratamientos": ["VALORIZACIÓN", "CDR"], "tipo_dens": {"BOTELLA TRANSPARENTE": 35.0, "BOTELLA COLOR": 35.0, "BOTELLAS FLAKE": 96.1538461538462, "CLAMSHELL ENTERO": 96.1538461538462, "CLAMSHELL FLAKE": 96.1538461538462, "GARRAFÓN MOLIDO": 50.0, "IMPRESO": 40.0, "PREFORMA ENTERA": 96.1538461538462, "PREFORMA MOLIDA": 96.1538461538462, "REDES": 60.0, "RESINA O FILTRADO": 96.1538461538462, "TORTA": 96.1538461538462, "ZUNCHO PET": 96.1538461538462, "BANDEJA NEGRA": 90.0, "ROLLO PLÁSTICO DESDE VIÑA SANTA RITA": 80.0, "BANDEJAS ENTERAS": 80.0, "BANDEJAS TRITURADAS": 350.0, "FLOTADORES ENTEROS": 300.0, "FLOTADORES TRITURADOS": 300.0, "BALDES ENTEROS": 100.0, "BALDES TRITURADOS": 350.0, "TAPAS ENTEROS": 200.0, "BIDONES ENTEROS SIN PROCESAR": 80.0, "TAMBORES ENTEROS": 90.0, "BIDONES TRITURADOS": 350.0, "BINS": 120.0, "BINS TRITURADOS": 380.0, "BOYAS ENTERAS": 60.0, "BOYAS TRITURADAS": 300.0, "PALLETS ENTEROS": 200.0, "PALLETS TRITURADOS": 400.0, "SOPLADO ENTERO": 90.0, "TUBERÍAS ENTERAS": 80.0, "TUBERÍAS TRITURADAS": 350.0, "TAPAS DE GARRAFÓN ENTERAS": 250.0, "TAPAS DE GARRAFÓN TRITURADAS": 400.0, "ROTOMOLDEO TRITURADO": 350.0, "BOTAS": 200.0, "BLISTER": 253.333333333333, "LAMAS": 253.333333333333, "VENTANAS": 150.0, "TUBERÍAS": 130.0, "CÁPSULA VINO": 250.0, "FILM PESCADO": 80.0, "PEBD COLOR": 33.33, "PEBD TRANSPARENTE": 33.33, "MANGUERA RIEGO ENTERA": 33.33, "MANGUERA RIEGO TRITURADA": 33.33, "TAPA GARRAFÓN ENTERO": 33.33, "TAPA GARRAFÓN MOLIDA": 33.33, "STRETCH FILM": 33.33, "PE EXPANDIDO": 33.33, "PP RÍGIDO ENTERO": 166.66666666666, "PP RÍGIDO TRITURADO": 166.66666666666, "CABOS ENTEROS (PTO MONTT)": 180.0, "CABOS TRITURADOS": 366.666666666667, "GANCHO ROPA": 150.0, "FILM": 77.7777777777778, "MALLA RASCHEL": 77.7777777777778, "MAXISACOS": 77.7777777777778, "RAFIA BLANCA": 44.4, "RAFIA CARBÓN": 44.4, "RAFIA CHICA": 44.4, "RAFIA COLOR": 44.4, "RAFIA GRIS": 44.4, "RAFIA NEGRA": 44.4, "RAFIA BLANCA + PEBD (BBL)": 44.4, "COTONA": 44.4, "CARPETA": 44.4, "CARRETE MOLIDO": 44.4, "CARRETE ENTERO": 44.4, "ZUNCHO PP": 35.0, "EPS SIN PROCESAR": 17.6, "EPS TORTA": 17.6, "EPS GRANEL": 17.6, "EPS TORTA COLOR": 17.6, "EPS TORTA NEGRO": 17.6, "EPS FILTRADO": 17.6, "EPS TORTA FILTRADO": 17.6, "EPS ALMACIGUERA": 17.6, "EPS TORTA ALMACIGUERA": 17.6, "EPS TORTA ALMACIGUERA ANTIGUAS": 17.6, "PAI FARDO CHICOS": 400.0, "PAI FARDO": 400.0, "PAI RAMAS NESTLÉ RECUPAC": 400.0, "PAI FARDO NESTLÉ RECUPAC": 400.0, "PAI FARDO POST CONSUMO": 400.0, "PAI ESTRELLA": 400.0, "PAI ESTRELLA NESTLÉ RECUPAC": 400.0, "PAI RAMA": 400.0, "PAI PROCESADO": 400.0, "PAI CARRETE ENTERO": 400.0, "PAI CARRETE MOLIDO": 400.0, "CRISTAL MOLIDO": 400.0, "CRISTAL ENTERO ANILLO": 400.0, "PAI BANDEJAS ENTERAS": 400.0, "PAI PROCESADO BANDEJAS SOPROLE": 400.0, "PAI ROLLOS": 400.0, "PAI ROLLOS TRITURADOS BLANCO": 400.0, "PAI POST CONSUMO": 400.0, "EPS BLOQUE": 18.0, "GARRAFÓN ENTERO": 50.0, "CD": 50.0, "LAMINA": 50.0, "RAMA": 50.0, "TORTAS Y RAMAS": 50.0, "FIBRA": 300.0, "ROLLOS POLIAMIDA": 500.0, "REDES NYLON": 180.0, "VIRUTA": 550.0, "ALARMAS": 150.0, "FARDO ABS": 400.0, "TRITURADO": 350.0, "MOLIDO": 450.0, "ENTERO": 400.0, "RAFIA + PA FILM": 60.0, "CORCHO": 90.0, "CARTÓN CORRUGADO": 58.3333333333333, "PUERTO MONTT (SIN PROCESAR)": 44.1176470588235, "CON CERA": 44.1176470588235, "ESQUINERO": 44.1176470588235, "CONO TRITURADO": 44.1176470588235, "CONO ENTERO SIN PROCESAR": 44.1176470588235, "CONO ENTERO": 44.1176470588235, "CARTÓN PARA LÍQUIDOS": 72.7272727272727, "BLANCO": 104.0, "REVISTA": 104.0, "DIARIO": 104.0, "CHATARRA": 800.0, "HOJALATA": 300.0, "CABLES ELÉCTRICOS": 300.0, "LATAS DE AEROSOLES": 500.0, "LATAS": 166.666666666667, "CAPSULAS VINO": 200.0, "PALLETS BUENOS": 250.0, "PALLETS MALOS": 200.0, "DESPUNTES": 300.0, "OTRAS MADERAS": 280.0, "MEZCLA DE PAPEL Y CARTÓN": 96.0, "ASIMILABLE A DOMICILIARIO": 42.4242424242424, "INDUSTRIAL": 200.0}, "tipo_kg": {"EPS SIN PROCESAR": {"min": 1, "max": 24000, "avg": 508, "p5": 1, "p95": 1584, "n": 157}, "MEZCLA DE PAPEL Y CARTÓN": {"min": 4, "max": 2880, "avg": 323, "p5": 17, "p95": 1200, "n": 204}, "PEBD TRANSPARENTE": {"min": 5, "max": 23297, "avg": 674, "p5": 10, "p95": 1007, "n": 70}, "CARTÓN PARA LÍQUIDOS": {"min": 0, "max": 1197, "avg": 29, "p5": 2, "p95": 78, "n": 211}, "FILM": {"min": 1, "max": 560, "avg": 48, "p5": 1, "p95": 560, "n": 14}, "BOTELLA TRANSPARENTE": {"min": 1, "max": 2149, "avg": 59, "p5": 3, "p95": 200, "n": 146}, "CABOS ENTEROS (PTO MONTT)": {"min": 1, "max": 5827, "avg": 636, "p5": 1, "p95": 5827, "n": 11}, "FILM PESCADO": {"min": 1, "max": 24573, "avg": 833, "p5": 2, "p95": 2050, "n": 126}, "METALES": {"min": 1, "max": 1320, "avg": 164, "p5": 1, "p95": 1320, "n": 13}, "HOJALATA": {"min": 1, "max": 9000, "avg": 362, "p5": 1, "p95": 2970, "n": 66}, "TUBERÍAS ENTERAS": {"min": 2, "max": 12808, "avg": 1831, "p5": 2, "p95": 12808, "n": 15}, "VIDRIO": {"min": 11, "max": 313, "avg": 97, "p5": 11, "p95": 313, "n": 19}, "RAFIA BLANCA": {"min": 5, "max": 19807, "avg": 3482, "p5": 15, "p95": 17676, "n": 87}, "PAPEL Y CARTÓN": {"min": 2, "max": 167, "avg": 59, "p5": 2, "p95": 167, "n": 13}, "BIDONES ENTEROS SIN PROCESAR": {"min": 5, "max": 5094, "avg": 284, "p5": 16, "p95": 700, "n": 67}, "LATAS DE AEROSOLES": {"min": 4, "max": 70, "avg": 34, "p5": 4, "p95": 70, "n": 6}, "LATAS": {"min": 1, "max": 110, "avg": 17, "p5": 1, "p95": 30, "n": 32}, "BOTELLA COLOR": {"min": 10, "max": 1300, "avg": 98, "p5": 10, "p95": 1300, "n": 18}, "PEBD COLOR": {"min": 1, "max": 13834, "avg": 530, "p5": 3, "p95": 1320, "n": 53}, "TAPAS DE GARRAFÓN ENTERAS": {"min": 2, "max": 3730, "avg": 546, "p5": 2, "p95": 3730, "n": 10}, "RESIDUOS ORGÁNICOS": {"min": 458, "max": 1230, "avg": 822, "p5": 458, "p95": 1230, "n": 12}, "CDR": {"min": 30, "max": 475, "avg": 225, "p5": 30, "p95": 440, "n": 36}, "BOTAS": {"min": 12, "max": 3283, "avg": 494, "p5": 12, "p95": 3283, "n": 8}, "ZUNCHO PET": {"min": 15, "max": 89, "avg": 43, "p5": 15, "p95": 89, "n": 6}, "BANDEJAS ENTERAS": {"min": 8, "max": 228, "avg": 69, "p5": 8, "p95": 228, "n": 11}, "RESIDUOS NO VALORIZABLES": {"min": 71, "max": 19678, "avg": 4939, "p5": 71, "p95": 19678, "n": 28}, "TEXTIL": {"min": 208, "max": 495, "avg": 322, "p5": 208, "p95": 495, "n": 5}, "EPS BLOQUE": {"min": 327, "max": 28521, "avg": 18041, "p5": 327, "p95": 28521, "n": 3}, "BOYAS ENTERAS": {"min": 1200, "max": 4320, "avg": 3104, "p5": 1200, "p95": 4320, "n": 11}, "TAMBORES ENTEROS": {"min": 10, "max": 2295, "avg": 273, "p5": 20, "p95": 775, "n": 25}, "TUBERÍAS": {"min": 6, "max": 120, "avg": 71, "p5": 6, "p95": 120, "n": 3}, "MIX RESIMPLE": {"min": 6, "max": 25634, "avg": 587, "p5": 25, "p95": 1054, "n": 176}, "TAPAS ENTEROS": {"min": 185, "max": 3634, "avg": 1110, "p5": 185, "p95": 3634, "n": 4}, "EPS TORTA": {"min": 1, "max": 150, "avg": 67, "p5": 1, "p95": 150, "n": 3}, "GARRAFÓN ENTERO": {"min": 515, "max": 5129, "avg": 1347, "p5": 515, "p95": 5129, "n": 7}, "NEUMÁTICOS FUERA DE USO": {"min": 4550, "max": 10424, "avg": 6781, "p5": 4550, "p95": 10424, "n": 4}, "CONO ENTERO": {"min": 662, "max": 1292, "avg": 977, "p5": 662, "p95": 1292, "n": 2}, "PLÁSTICOS": {"min": 121, "max": 662, "avg": 482, "p5": 121, "p95": 662, "n": 3}, "FLOTADORES TRITURADOS": {"min": 14211, "max": 30000, "avg": 19738, "p5": 14211, "p95": 30000, "n": 3}, "CARTÓN CORRUGADO": {"min": 5, "max": 28589, "avg": 585, "p5": 10, "p95": 980, "n": 143}, "BIDONES TRITURADOS": {"min": 126, "max": 1025, "avg": 585, "p5": 126, "p95": 1025, "n": 4}, "STRETCH FILM": {"min": 6, "max": 25484, "avg": 3198, "p5": 6, "p95": 25484, "n": 8}, "BLANCO": {"min": 2380, "max": 22978, "avg": 12679, "p5": 2380, "p95": 22978, "n": 2}}};
+const CONFIG={"movimiento": ["Ingreso", "Traslado"], "formato": ["SACAS", "FARDOS", "GRANEL", "TAMBORES", "PALLET", "TOLVA 90M3", "TOLVA 30M3", "TOLVA 20 M3", "TOLVA 10M3", "BINS", "TOLVA 12M3", "TOLVA 13M3"], "gestion": ["NACIONAL", "EXTRANJERO"], "proceso": ["VALORIZACIÓN", "CDR", "RELLENO SANITARIO", "MAQUILA RESIMPLE", "COMPOSTAJE"], "clientes": {"ZERO CORP S.A": "77203549-7", "VITAPRO CHILE S.A": "96677260-3", "TRUSAL S.A": "96566740-7", "SURPROCESO S.A": "76346370-2", "SOCIEDAD LAGOSMAQ LTDA": "76016216-7", "SOCIEDAD COMERCIAL INDUSTRIAL CHILEPLAST S.A": "76256667-2", "SOCIEDAD COMERCIAL DE SERVICIOS GESTION INTEGRAL LTDA": "77757246-6", "SEA GARDEN (GESTION AMBIENTE)": "76628460-4", "SALMONES DE CHILE ( GESTION AMBIENTE )": "99520820-2", "SALMONES BLUMAR S.A": "76653690-5", "RESIMPLE": "65218304-2", "RECICLA LLANQUIHUE": "11251029-K", "PROCESADORA CALBUCO SPA": "76495180-8", "PISCICULTURA LICAN LTDA": "76024330-2", "PESQUERA Y CONSERVERA TAMAI LTDA": "87516300-0", "PESQUERA TRANS ANTARTIC LTDA": "76169670-K", "PESQUERA DEL MAR ANTARTICO S.A": "96514710-1", "PAZ RECYCLING CONSULTING SPA": "77268155-0", "PANELES Y CUBIERTAS ARRATIA SPA": "76823159-1", "NEWREST CATERING Y SERVICIOS CHILE SPA": "78544560-0", "MOWI CHILE S.A": "96633780-K", "MARINE FARMS CHILE S A": "96611190-9", "MANANTIAL S.A": "96711590-8", "INVERMAR S.A": "79797990-2", "INTAC PROCESOS SPA": "76207765-5", "INGESAT INGENIERIA Y SERVICIOS EN ALTA TENSION S.A": "78788250-1", "GRANJA MARINA TORNAGALEONES S.A": "87752000-5", "GLOBALTEC SERVICIOS Y CONSTRUCCIÓN LTDA": "76051155-2", "GESTION AMBIENTE S.A": "96929830-9", "EXPORTADORA LOS FIORDOS LTDA": "79872420-7", "EMPRESAS AQUACHILE S.A": "86247400-7", "EMPRESA PORTUARIA PUERTO MONTT": "61950900-5", "EMPRESA CONSTRUCTORA PRECON S.A": "93740000-4", "ECOFIBRAS S.A": "99545960-4", "DSM-FIRMENICH DE CHILE SPA": "78061267-3", "DESARROLLOS CONSTRUCTIVOS AXIS S.A": "79925220-1", "CERMAQ CHILE S.A": "79784980-4", "CONTROL AND MANAGEMENT SPA": "77127923-6", "CONSTRUCTORA NOVAL LTDA": "76053696-2", "CONSTRUCTORA ASFALCURA S.A": "76298660-4", "CONGELADOS Y CONSERVAS FITZ ROY S.A": "96949830-8", "COMPASS CATERING S.A": "96651910-K", "COMERCIALIZADORA CRANDON CHILE LTDA": "76029733-K", "COMERCIAL Y SERVICIOS SUR AUSTRAL LTDA": "77071440-0", "COMERCIAL TEDDY ENRIQUE DOEPKING RIOS LTDA": "76039757-1", "CIA SALMONIFERA DALCAHUE LTDA": "79777030-2", "CAMPO LIMPIO": "65228234-2", "BIOMAR CHILE S.A": "96512650-3", "BADINOTTI CHILE SPA": "96930940-8", "AUSTRALIS MAR  S.A": "76003885-7", "AQUAGESTION S.A": "99591760-2", "AISLAPOL S.A": "76412645-9", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA": "77215640-5", "ABICK S.A": "76113326-8", "CONSTUCTORA INGEVEC S.A": "89853600-9", "SOC. COM. EMPRENDEDORES DEL SUR LTDA (EMPRESUR)": "76792130-6", "BADINOTTI GROUP": "96930940-8", "RIO DLCE S.A": "96989370-3", "DSM NUTRITIONAL PRODUCTS CHILE S.A": "96959470-6", "TRUSAL S.A pisc STH": "96566740-7", "PESQUERA TRANS ANTARTIC LTDA  DETIF -LIUCURA": "76169670-K", "TRUSAL PUNTO LIMPIO ALTO BONITO": "96566740-7", "AQUACHILE": "86247400-7", "0": "0"}, "transporte": {"VICTOR ASENCIO Y CIA LTDA": {"rut": "76076829-4", "patente": "DBGR92"}, "TRUSAL S.A": {"rut": "96566740-7", "patente": "0"}, "TRULY NOLEN CHILE S A": {"rut": "96591760-8", "patente": "LKVS44"}, "TRASUR S.A": {"rut": "76222078-4", "patente": "0"}, "TRANSPORTES SANTA CLARA LTDA": {"rut": "76812847-2", "patente": "GDVH62"}, "TRANSPORTES MARIA EUFEMIA BELTRAN RIOS EIRL": {"rut": "76313844-5", "patente": "0"}, "TRANSPORTES LUIS PEÑA EIRL": {"rut": "76670048-9", "patente": "CV1756"}, "TRANSPORTES JIMENA BEATRÍZ ZEH GUARDA EIRL": {"rut": "76821342-9", "patente": "ZA8658"}, "TRANSPORTE IVAN VELASQUEZ DIAZ EIRL": {"rut": "76658039-4", "patente": "DGRF63"}, "SOCIEDAD DE TRANSPORTES FERELEC LTDA": {"rut": "77022359-8", "patente": "0"}, "SOCIEDAD AGRICOLA B&G SPA": {"rut": "77060531-8", "patente": "RJJV63"}, "SOCIEDAD COMERCIAL EMPRENDEDORES DEL SUR LTDA": {"rut": "76792130-6", "patente": "CBLZ54"}, "SERVICIOS SOTRAMAT SPA": {"rut": "77279379-0", "patente": "0"}, "SERVICIOS LUIS DANIEL PEÑA GALINDEZ EIRL": {"rut": "76988039-9", "patente": "RFHY22"}, "SEMILLAS SZ SOCIEDAD ANONIMA": {"rut": "85992100-0", "patente": "0"}, "MOWI CHILE S.A": {"rut": "96633780-K", "patente": "VHZX39"}, "SANTA LUCIA SPA": {"rut": "78069921-3", "patente": "BGXY48"}, "RODRIGO ALEJANDRO CRUZ RUBIO": {"rut": "20370118-7", "patente": "SZPP63"}, "RECUPERACION Y RECICLAMIENTO RECIPULLI": {"rut": "77186522-4", "patente": "0"}, "RECICLAJE YERKO RAMOS EIRL": {"rut": "77587755-3", "patente": "0"}, "RAMÓN JESÚS HUENUQUEO PILQUIMÁN": {"rut": "14035532-1", "patente": "GFJG46"}, "PUERTOVERDE CUIDA Y RECICLA SPA": {"rut": "77388764-0", "patente": "FHVY85"}, "PROSERVIS SPA": {"rut": "77601429-K", "patente": "0"}, "PISCICULTURA LICAN LTDA": {"rut": "76024330-2", "patente": "SJKC27"}, "PELLET PUERTO VARAS SPA": {"rut": "76507376-6", "patente": "JVCS21"}, "PAUL OWEN LÓPEZ DÍAZ": {"rut": "12169818-8", "patente": "ZB7579"}, "PABLO JOSÉ GÁLVEZ FARÍAS": {"rut": "9498297-9", "patente": "SW6620"}, "NATALI TAMARA GUZMÁN CÁCERES": {"rut": "16625388-8", "patente": "RGDR55"}, "MÓNICA ARIELA ÁLVAREZ BARRÍA": {"rut": "11251029-K", "patente": "DKDL95"}, "MARLENE ALEXIS AMPUERO GALLARDO": {"rut": "11252281-6", "patente": "BLZK38"}, "MARÍA ALEJANDRA TORRES BELLO": {"rut": "13509540-0", "patente": "TKRJ39"}, "LUIS ALBERTO PADILLA OLAVARRÍA": {"rut": "13737553-2", "patente": "SW6120"}, "KARINA NATALY RAMOS MORAGA": {"rut": "16111668-8", "patente": "KXBB66"}, "IVÁN CIPRIANO VARAS VILLANUEVA": {"rut": "13165193-7", "patente": "FKBB66"}, "HERZA SPA": {"rut": "77335164-3", "patente": "0"}, "GESTION AMBIENTE S.A": {"rut": "96929830-9", "patente": "GFZW87"}, "FELIPE MAINO ANTONIO CABEZAS HERRER": {"rut": "18669427-9", "patente": "RHSD88"}, "EMPRESA DE TRANSPORTES JOSE BOHLE E HIJO S LTDA": {"rut": "76775068-4", "patente": "ZS3170"}, "ECOFIBRAS S.A (PUERTO MONTT)": {"rut": "99545960-4", "patente": "DVHC14"}, "ECOFIBRAS S.A (CORONEL)": {"rut": "99545960-4", "patente": "0"}, "DSM-FIRMENICH DE CHILE SPA": {"rut": "78061267-3", "patente": "0"}, "DESARROLLOS CONSTRUCTIVOS AXIS": {"rut": "79925220-1", "patente": "KCRW61"}, "COSEMAR SERVICIOS INDUSTRIALES SPA": {"rut": "76214156-6", "patente": "VLRL19"}, "CAMPO LIMPIO": {"rut": "65228234-2", "patente": "HLGY46"}, "BRIDGE VENTURES SPA": {"rut": "76448760-5", "patente": "0"}, "COOPERATIVA DE TRABAJO RECICLADORES DE LA PATAGONIA LTDA": {"rut": "65256448-8", "patente": "TSPL87"}, "COMERCIAL KAUFMANN S.A": {"rut": "96572360-9", "patente": "VSDV50"}, "CHRISTIAN MARCELO VIDELA FUENTES": {"rut": "8866695-K", "patente": "GFJG56"}, "CÉSAR ANTONIO SILVA VARGAS": {"rut": "13169027-4", "patente": "PZCY58"}, "PESQUERA DEL MAR ANTARTICO S.A": {"rut": "96514710-1", "patente": "VJCV17"}, "SURPROCESO S.A": {"rut": "76346370-2", "patente": "TYHZ54"}, "AMBIPAR ENVIRONMENT CHILE LTDA": {"rut": "96824110-9", "patente": "KZWS95"}, "ALEXIS HARNOLDO OSANDÓN GALLOSO": {"rut": "14509843-2", "patente": "GHVY85"}, "ALEJANDRO JAVIER WENER HELD": {"rut": "17999953-6", "patente": "CGHK85"}, "AGRICOLA LAS ROCAS LTDA": {"rut": "76434389-1", "patente": "JXDY25"}, "ECOFIBRAS S.A (SAN BERNARDO)": {"rut": "99545960-4", "patente": "RRGB45"}, "RIO DULCE S.A.": {"rut": "96989370-3", "patente": "TYHZ54"}, "TRUSAL S.A pisc STH": {"rut": "96566740-7", "patente": "JP5278"}, "TRANSPORTE WLADYMIR SALAS": {"rut": "15107176-7", "patente": "0"}, "RESIMPLE": {"rut": "0", "patente": "VRLR-24"}, "COMERCIALIZADORA CRANDON CHILE SPA": {"rut": "76029733-K", "patente": "CXBH63"}}, "pat2tr": {"DBGR92": "VICTOR ASENCIO Y CIA LTDA", "HGRJ35": "VICTOR ASENCIO Y CIA LTDA", "HTZB22": "VICTOR ASENCIO Y CIA LTDA", "JLJF48": "VICTOR ASENCIO Y CIA LTDA", "JXZP83": "VICTOR ASENCIO Y CIA LTDA", "JXZP84": "VICTOR ASENCIO Y CIA LTDA", "SJWL17": "VICTOR ASENCIO Y CIA LTDA", "SLWR47": "VICTOR ASENCIO Y CIA LTDA", "WU3959": "VICTOR ASENCIO Y CIA LTDA", "LKVS44": "TRULY NOLEN CHILE S A", "GDVH62": "TRANSPORTES SANTA CLARA LTDA", "CV1756": "TRANSPORTES LUIS PEÑA EIRL", "RK8186": "TRANSPORTES LUIS PEÑA EIRL", "ZA8658": "TRANSPORTES JIMENA BEATRÍZ ZEH GUARDA EIRL", "DGRF63": "TRANSPORTE IVAN VELASQUEZ DIAZ EIRL", "HHKP55": "TRANSPORTE IVAN VELASQUEZ DIAZ EIRL", "RJJV63": "SOCIEDAD AGRICOLA B&G SPA", "CBLZ54": "SOCIEDAD COMERCIAL EMPRENDEDORES DEL SUR LTDA", "RFHY22": "SERVICIOS LUIS DANIEL PEÑA GALINDEZ EIRL", "VHZX39": "MOWI CHILE S.A", "BGXY48": "SANTA LUCIA SPA", "SZPP63": "RODRIGO ALEJANDRO CRUZ RUBIO", "TPJP64": "RECUPERACION Y RECICLAMIENTO RECIPULLI", "PHKF78": "RECICLAJE YERKO RAMOS EIRL", "GFJG46": "RAMÓN JESÚS HUENUQUEO PILQUIMÁN", "FHVY85": "PUERTOVERDE CUIDA Y RECICLA SPA", "SJKC27": "PISCICULTURA LICAN LTDA", "JVCS21": "PELLET PUERTO VARAS SPA", "ZB7579": "PAUL OWEN LÓPEZ DÍAZ", "SW6620": "PABLO JOSÉ GÁLVEZ FARÍAS", "RGDR55": "NATALI TAMARA GUZMÁN CÁCERES", "DKDL95": "MÓNICA ARIELA ÁLVAREZ BARRÍA", "BLZK38": "MARLENE ALEXIS AMPUERO GALLARDO", "TKRJ39": "MARÍA ALEJANDRA TORRES BELLO", "SW6120": "LUIS ALBERTO PADILLA OLAVARRÍA", "KXBB66": "KARINA NATALY RAMOS MORAGA", "FKBB66": "IVÁN CIPRIANO VARAS VILLANUEVA", "ZB7578": "IVÁN CIPRIANO VARAS VILLANUEVA", "GFZW87": "GESTION AMBIENTE S.A", "VJCV15": "GESTION AMBIENTE S.A", "RHSD88": "FELIPE MAINO ANTONIO CABEZAS HERRER", "ZS3170": "EMPRESA DE TRANSPORTES JOSE BOHLE E HIJO S LTDA", "DVHC14": "ECOFIBRAS S.A (PUERTO MONTT)", "GXJX13": "ECOFIBRAS S.A (PUERTO MONTT)", "GXJX14": "ECOFIBRAS S.A (PUERTO MONTT)", "JKYK70": "ECOFIBRAS S.A (PUERTO MONTT)", "GXJX15": "ECOFIBRAS S.A (PUERTO MONTT)", "GXJX16": "ECOFIBRAS S.A (PUERTO MONTT)", "GXJX17": "ECOFIBRAS S.A (PUERTO MONTT)", "DHBC14": "ECOFIBRAS S.A (PUERTO MONTT)", "RHDZ51": "ECOFIBRAS S.A (PUERTO MONTT)", "KCRW61": "DESARROLLOS CONSTRUCTIVOS AXIS", "VLRL19": "COSEMAR SERVICIOS INDUSTRIALES SPA", "VSDG73": "COSEMAR SERVICIOS INDUSTRIALES SPA", "DTDJ19": "COSEMAR SERVICIOS INDUSTRIALES SPA", "VRLR19": "COSEMAR SERVICIOS INDUSTRIALES SPA", "VRLR17": "COSEMAR SERVICIOS INDUSTRIALES SPA", "HLGY46": "CAMPO LIMPIO", "TSPL87": "COOPERATIVA DE TRABAJO RECICLADORES DE LA PATAGONIA LTDA", "BXDR15": "COOPERATIVA DE TRABAJO RECICLADORES DE LA PATAGONIA LTDA", "VSDV50": "COMERCIAL KAUFMANN S.A", "GFJG56": "CHRISTIAN MARCELO VIDELA FUENTES", "PZCY58": "CÉSAR ANTONIO SILVA VARGAS", "VJCV17": "PESQUERA DEL MAR ANTARTICO S.A", "RPTY78": "PESQUERA DEL MAR ANTARTICO S.A", "TYHZ54": "RIO DULCE S.A.", "SDXV11": "TRANSPORTE IVAN VELASQUEZ DIAZ EIRL", "SZZP63": "PESQUERA DEL MAR ANTARTICO S.A", "TRKJ39": "PESQUERA DEL MAR ANTARTICO S.A", "KZWS95": "AMBIPAR ENVIRONMENT CHILE LTDA", "TPVC48": "AMBIPAR ENVIRONMENT CHILE LTDA", "DRXX44": "AMBIPAR ENVIRONMENT CHILE LTDA", "DRXX47": "AMBIPAR ENVIRONMENT CHILE LTDA", "DRXX48": "AMBIPAR ENVIRONMENT CHILE LTDA", "DRXX50": "AMBIPAR ENVIRONMENT CHILE LTDA", "GHVY85": "ALEXIS HARNOLDO OSANDÓN GALLOSO", "CGHK85": "ALEJANDRO JAVIER WENER HELD", "JXDY25": "AGRICOLA LAS ROCAS LTDA", "FSVC33": "ECOFIBRAS S.A (PUERTO MONTT)", "GFZT17": "ECOFIBRAS S.A (PUERTO MONTT)", "GKJK14": "ECOFIBRAS S.A (PUERTO MONTT)", "RRGB45": "ECOFIBRAS S.A (SAN BERNARDO)", "VSDV49": "SURPROCESO S.A", "DRXX49": "AMBIPAR ENVIRONMENT CHILE LTDA", "SZYB72": "AMBIPAR ENVIRONMENT CHILE LTDA", "JP5278": "TRUSAL S.A pisc STH", "VRLR-24": "RESIMPLE", "CXBH63": "COMERCIALIZADORA CRANDON CHILE SPA"}, "generadores": ["RESIMPLE (COMUNA DE PUERTO VARAS)", "RESIMPLE (COMUNA DE PUERTO MONTT)", "ECOFIBRAS S.A (PUERTO MONTT)", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA (ARCOPRIME PUERTO MONTT)", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA (ARCOPRIME PUERTO VARAS)", "ADMINISTRADORA DE VENTAS AL DETALLE LTDA (ARCOPRIME PARGUA)", "TRUSAL S.A (ALTO BONITO)", "TRUSAL S.A (CAICAEN)", "TRUSAL S.A (LA TABLILLA)", "TRUSAL S.A (LIMPIEZA DE PLAYA PUELO)", "TRUSAL S.A (OPERACIONES)", "TRUSAL S.A (PISCULTURA LAS ARAUCARIAS)", "BIOMAR CHILE S.A (DALCAHUE)", "BIOMAR CHILE S.A (ERCILLA)", "BIOMAR CHILE S.A (PARGUA)", "MOWI CHILE S.A (CAICAEN)", "MOWI CHILE S.A (CENTRO CALABOZO)", "MOWI CHILE S.A (CENTRO COPIHUE)", "MOWI CHILE S.A (CENTRO PULELO)", "MOWI CHILE S.A (CENTRO TEUPA)", "MOWI CHILE S.A (CENTRO TRAINEL)", "MOWI CHILE S.A (CHINQUIHUE PLANTA)", "MOWI CHILE S.A (CHINQUIHUE PUNTO LIMPIO)", "MOWI CHILE S.A (DOMEYKO)", "MOWI CHILE S.A (PISCICULTURA COPIHUE)", "MOWI CHILE S.A (RAUCO)", "EMPRESAS AQUACHILE S.A (CARDONAL)", "EMPRESAS AQUACHILE S.A (TEMPAX)", "EMPRESAS AQUACHILE S.A (CALBUCO)", "EMPRESAS AQUACHILE S.A (QUELLÓN)", "CONSTRUCTORA NOVAL LTDA (OSORNO)", "CONSTRUCTORA NOVAL LTDA (PUNTO LIMPIO GRANITICA)", "SEMILLAS SZ SOCIEDAD ANONIMA (CAMPO LIMPIO)", "PESQUERA DEL MAR ANTARTICO S.A", "SALMONES DE CHILE ( GESTION AMBIENTE )", "SEA GARDEN ( GESTION AMBIENTE )", "ECOFIBRAS S.A (CORONEL)", "ECOFIBRAS S.A (SAN BERNARDO)", "TRULY NOLEN CHILE S.A", "ABICK S.A", "MANANTIAL S.A", "SURPROCESO S.A", "COMERCIAL Y SERVICIOS SUR AUSTRAL LTDA", "DSM-FIRMENICH", "CIA SALMONIFERA DALCAHUE LTDA", "RESIMPLE (COMUNA DE LAGO VERDE)", "PUERTO VERDE", "AQUAGESTION S.A", "CONSTRUCTORA ASFALCURA S.A", "AUSTRALIS MAR S.A", "BADINOTTI CHILE S.A", "CERMAQ CHILE S.A", "SALMONES BLUMAR S.A", "EMPRESA PORTUARIA PUERTO MONTT (EMPORMONTT)", "COMERCIALIZADORA CRANDON CHILE LTDA", "INTAC PROCESOS SPA", "PESQUERA TRANS ANTARTIC LTDA", "RECICLA LLANQUIHUE", "RECUPERACION Y RECICLAMIENTO RECIPULLI", "VITAPRO CHILE S.A", "SOC. COM. EMPRENDEDORES DEL SUR LTDA (EMPRESUR)", "GLOBALTEC SERVICIOS Y CONSTRUCCIÓN LTDA", "RESIMPLE (COMUNA DE PUERTO VERDE)", "MANANTIAL S.A (PUERTO MONTT)", "AISLAPOL S.A", "EXPORTADORA LOS FIORDOS LTDA", "MOWI CHILE S.A (HUELMO)", "TRUSAL PISCICULTURA STH", "TRUSAL( CHAMIZA )", "SOCIEDAD AGRICOLA B&G SPA (CAMPO LIMPIO)", "EMPRESUR", "DESARROLLOS CONSTRUCTIVOS AXIS S.A", "RIO DULCE S.A.", "ASOCIACION DE PRODUCTORES DE ENVASES Y EMBALAJES DE SUSTANCIAS PELIGRO", "PESQUERA TRANS ANTARTIC LTDA  (DETIF -LIUCURA)", "0", "TRUSAL S.A (CHAMIZA)", "TRUSAL S.A (CONTAO)", "TRUSAL S.A (PUELO)"], "destinatarios": {"AMBIPAR SERVICIOS DE VALORIZACION LTDA": "78874640-7", "BIOPLASTIC SPA": "77704270-K", "ECOFIBRAS S.A (SAN BERNARDO)": "99545960-4", "AMBIPAR ENVIRONMENT CHILE LTDA": "96824110-9", "FORESTAL Y PAPELERA CONCEPCION S.A": "96528420-6", "METALURGICA VIRUTEX ILKO S.A": "93550000-1", "COMERCIALIZADORA CRANDON CHILE LTDA": "76029733-K", "REUTILIZACIÓN DE ENVASES PLASTICOS LTDA": "77933902-5", "SOCIEDAD COMERCIAL INDUSTRIAL CHILEPLAST SPA": "76256667-2", "ZEROCORP SPA": "77203549-7", "PROCESADORA CALBUCO SPA": "76495180-8", "RECICLAJES CORESA SPA (RECCOR)": "77737609-8", "VIRUTEX ILKO S.A": "93550000-1", "SOCIEDAD Y COMERCIAL Y TRANSPORTE  MAQUINEX LTDA (METALEX)": "76330871-5", "RESIMPLE": "65218304-2", "COMERCIAL SPRAYLAP CHILE LTDA": "76029733-K", "CAMPO LIMPIO": "65228234-2", "ECOFIBRAS S.A (CORONEL)": "99545960-4", "0": "0"}, "material_to_familia": {"PET": "PLÁSTICOS", "PEAD - HDPE": "PLÁSTICOS", "PVC": "PLÁSTICOS", "PEBD - LDPE": "PLÁSTICOS", "PEBD - LLDPE": "PLÁSTICOS", "PP": "PLÁSTICOS", "PS": "PLÁSTICOS", "PC": "PLÁSTICOS", "PA": "PLÁSTICOS", "ABS": "PLÁSTICOS", "POM - ACETAL": "PLÁSTICOS", "PP + PA": "PLÁSTICOS", "PEE": "PLÁSTICOS", "CARTÓN": "CARTÓN Y PAPEL", "PAPEL": "CARTÓN Y PAPEL", "METALES": "METALES", "ALUMINIO": "METALES", "ALUMINIO + PEBD": "METALES", "MADERA": "MADERA", "VIDRIOS": "VIDRIO", "CAUCHO": "CAUCHO", "TEXTIL": "TEXTIL", "ELECTRONICOS": "ELECTRÓNICOS", "TIERRAS": "TIERRAS", "LODOS": "LODOS", "INVENTARIO OBSOLETO": "INVENTARIO OBSOLETO", "ENVASES Y EMBALAJES": "ENVASES Y EMBALAJES", "NO RECICLABLES": "NO RECICLABLES", "RECICLABLES": "RECICLABLES", "CDR": "CDR", "DESCARTE": "DESCARTE", "RESIMPLE": "RESIMPLE"}, "tipo_to_material": {"BOTELLA TRANSPARENTE": "PET", "BOTELLA COLOR": "PET", "BOTELLAS FLAKE": "PET", "CLAMSHELL ENTERO": "PET", "CLAMSHELL FLAKE": "PET", "GARRAFÓN MOLIDO": "PET", "IMPRESO": "PET", "PREFORMA ENTERA": "PET", "PREFORMA MOLIDA": "PET", "REDES": "PET", "RESINA O FILTRADO": "PET", "TORTA": "PET", "ZUNCHO PET": "PET", "BANDEJA NEGRA": "PET", "ROLLO PLÁSTICO DESDE VIÑA SANTA RITA": "PET", "BANDEJAS ENTERAS": "PEAD - HDPE", "BANDEJAS TRITURADAS": "PEAD - HDPE", "FLOTADORES ENTEROS": "PEAD - HDPE", "FLOTADORES TRITURADOS": "PEAD - HDPE", "BALDES ENTEROS": "PEAD - HDPE", "BALDES TRITURADOS": "PEAD - HDPE", "TAPAS ENTEROS": "PEAD - HDPE", "BIDONES ENTEROS SIN PROCESAR": "PEAD - HDPE", "TAMBORES ENTEROS": "PEAD - HDPE", "BIDONES TRITURADOS": "PEAD - HDPE", "BINS": "PEAD - HDPE", "BINS TRITURADOS": "PEAD - HDPE", "BOYAS ENTERAS": "PEAD - HDPE", "BOYAS TRITURADAS": "PEAD - HDPE", "PALLETS ENTEROS": "PEAD - HDPE", "PALLETS TRITURADOS": "PEAD - HDPE", "SOPLADO ENTERO": "PEAD - HDPE", "TUBERÍAS ENTERAS": "PEAD - HDPE", "TUBERÍAS TRITURADAS": "PEAD - HDPE", "TAPAS DE GARRAFÓN ENTERAS": "PEAD - HDPE", "TAPAS DE GARRAFÓN TRITURADAS": "PEAD - HDPE", "ROTOMOLDEO TRITURADO": "PEAD - HDPE", "BOTAS": "PVC", "BLISTER": "PVC", "LAMAS": "PVC", "VENTANAS": "PVC", "TUBERÍAS": "PVC", "CÁPSULA VINO": "PVC", "FILM PESCADO": "PEBD - LDPE", "PEBD COLOR": "PEBD - LDPE", "PEBD TRANSPARENTE": "PEBD - LDPE", "MANGUERA RIEGO ENTERA": "PEBD - LDPE", "MANGUERA RIEGO TRITURADA": "PEBD - LDPE", "TAPA GARRAFÓN ENTERO": "PEBD - LDPE", "TAPA GARRAFÓN MOLIDA": "PEBD - LDPE", "STRETCH FILM": "PEBD - LLDPE", "PE EXPANDIDO": "PEBD - LLDPE", "PP RÍGIDO ENTERO": "PP", "PP RÍGIDO TRITURADO": "PP", "CABOS ENTEROS (PTO MONTT)": "PP", "CABOS TRITURADOS": "PP", "GANCHO ROPA": "PP", "FILM": "PP", "MALLA RASCHEL": "PP", "MAXISACOS": "PP", "RAFIA BLANCA": "PP", "RAFIA CARBÓN": "PP", "RAFIA CHICA": "PP", "RAFIA COLOR": "PP", "RAFIA GRIS": "PP", "RAFIA NEGRA": "PP", "RAFIA BLANCA + PEBD (BBL)": "PP", "COTONA": "PP", "CARPETA": "PP", "CARRETE MOLIDO": "PP", "CARRETE ENTERO": "PP", "ZUNCHO PP": "PP", "EPS SIN PROCESAR": "PS", "EPS TORTA": "PS", "EPS GRANEL": "PS", "EPS TORTA COLOR": "PS", "EPS TORTA NEGRO": "PS", "EPS FILTRADO": "PS", "EPS TORTA FILTRADO": "PS", "EPS ALMACIGUERA": "PS", "EPS TORTA ALMACIGUERA": "PS", "EPS TORTA ALMACIGUERA ANTIGUAS": "PS", "PAI FARDO CHICOS": "PS", "PAI FARDO": "PS", "PAI RAMAS NESTLÉ RECUPAC": "PS", "PAI FARDO NESTLÉ RECUPAC": "PS", "PAI FARDO POST CONSUMO": "PS", "PAI ESTRELLA": "PS", "PAI ESTRELLA NESTLÉ RECUPAC": "PS", "PAI RAMA": "PS", "PAI PROCESADO": "PS", "PAI CARRETE ENTERO": "PS", "PAI CARRETE MOLIDO": "PS", "CRISTAL MOLIDO": "PS", "CRISTAL ENTERO ANILLO": "PS", "PAI BANDEJAS ENTERAS": "PS", "PAI PROCESADO BANDEJAS SOPROLE": "PS", "PAI ROLLOS": "PS", "PAI ROLLOS TRITURADOS BLANCO": "PS", "PAI POST CONSUMO": "PS", "EPS BLOQUE": "PS", "GARRAFÓN ENTERO": "PC", "CD": "PC", "LAMINA": "PC", "RAMA": "PC", "TORTAS Y RAMAS": "PC", "FIBRA": "PA", "ROLLOS POLIAMIDA": "PA", "REDES NYLON": "PA", "VIRUTA": "PA", "ALARMAS": "ABS", "FARDO ABS": "ABS", "TRITURADO": "ABS", "MOLIDO": "ABS", "ENTERO": "POM - ACETAL", "RAFIA + PA FILM": "PP + PA", "CORCHO": "PEE", "CARTÓN CORRUGADO": "CARTÓN", "PUERTO MONTT (SIN PROCESAR)": "CARTÓN", "CON CERA": "CARTÓN", "ESQUINERO": "CARTÓN", "CONO TRITURADO": "CARTÓN", "CONO ENTERO SIN PROCESAR": "CARTÓN", "CONO ENTERO": "CARTÓN", "CARTÓN PARA LÍQUIDOS": "NO RECICLABLES", "BLANCO": "PAPEL", "REVISTA": "PAPEL", "DIARIO": "PAPEL", "CHATARRA": "METALES", "HOJALATA": "METALES", "CABLES ELÉCTRICOS": "METALES", "LATAS DE AEROSOLES": "METALES", "LATAS": "ALUMINIO", "CAPSULAS VINO": "ALUMINIO + PEBD", "PALLETS BUENOS": "MADERA", "PALLETS MALOS": "MADERA", "DESPUNTES": "MADERA", "OTRAS MADERAS": "MADERA", "VIDRIO COLOR": "VIDRIOS", "VIDRIO": "VIDRIOS", "NEUMÁTICOS FUERA DE USO": "CAUCHO", "TROZOS DE CAUCHO": "CAUCHO", "CORREA TRANSPORTADORA ALMA NYLON": "CAUCHO", "CORREA TRANSPORTADORA ALMA ACERO": "CAUCHO", "RETAZOS DE CORREA TRANSPORTADORA": "CAUCHO", "ROPA": "TEXTIL", "ELECTRÓNICOS": "ELECTRÓNICOS", "PEQUEÑOS APARATOS": "ELECTRÓNICOS", "MONITORES, PANTALLAS": "ELECTRÓNICOS", "LÁMPARAS": "ELECTRÓNICOS", "PANELES FOTOVOLTAICOS": "ELECTRÓNICOS", "GRANDES APARATOS": "ELECTRÓNICOS", "APARATOS DE INTERCAMBIO DE TEMPERATURA": "ELECTRÓNICOS", "TIERRAS CONTAMINADAS": "TIERRAS", "LODOS CONTAMINADOS": "LODOS", "LODO PULPER": "LODOS", "LODO PLANTA RILES": "LODOS", "LODOS PTAS": "LODOS", "FÁRMACOS": "INVENTARIO OBSOLETO", "ALIMENTO LÁCTEO": "INVENTARIO OBSOLETO", "ALIMENTO PANADERÍA Y PASTELERÍA": "INVENTARIO OBSOLETO", "INVENTARIO": "INVENTARIO OBSOLETO", "TEXTIL": "NO RECICLABLES", "MATERIAL CONSTRUCCIÓN": "INVENTARIO OBSOLETO", "COSMÉTICOS": "INVENTARIO OBSOLETO", "MATERIAS PRIMAS": "INVENTARIO OBSOLETO", "DECOMISOS": "INVENTARIO OBSOLETO", "TABACO": "INVENTARIO OBSOLETO", "MEZCLA DE ENVASES Y EMBALAJES": "ENVASES Y EMBALAJES", "MEZCLA DE METALES": "ENVASES Y EMBALAJES", "MEZCLA DE PAPEL Y CARTÓN": "ENVASES Y EMBALAJES", "MEZCLA DE PLÁSTICOS": "ENVASES Y EMBALAJES", "PLÁSTICOS": "NO RECICLABLES", "PAPEL Y CARTÓN": "NO RECICLABLES", "METALES": "NO RECICLABLES", "MADERA": "NO RECICLABLES", "ASIMILABLE A DOMICILIARIO": "NO RECICLABLES", "ESCOMBROS": "NO RECICLABLES", "RESIDUOS ORGÁNICOS": "RECICLABLES", "INDUSTRIAL": "NO RECICLABLES", "SÓLIDOS CONTAMINADOS": "NO RECICLABLES", "ACEITES Y LUBRICANTES USADOS": "NO RECICLABLES", "CDR": "CDR", "RESIDUOS NO VALORIZABLES": "DESCARTE", "ENVASES LIGEROS RESIMPLE": "RESIMPLE", "MIX RESIMPLE": "RESIMPLE", "PAPEL Y CARTÓN RESIMPLE": "RESIMPLE"}, "tipo_dens": {"BOTELLA TRANSPARENTE": 35.0, "BOTELLA COLOR": 35.0, "BOTELLAS FLAKE": 96.1538461538462, "CLAMSHELL ENTERO": 96.1538461538462, "CLAMSHELL FLAKE": 96.1538461538462, "GARRAFÓN MOLIDO": 50.0, "IMPRESO": 40.0, "PREFORMA ENTERA": 96.1538461538462, "PREFORMA MOLIDA": 96.1538461538462, "REDES": 60.0, "RESINA O FILTRADO": 96.1538461538462, "TORTA": 96.1538461538462, "ZUNCHO PET": 96.1538461538462, "BANDEJA NEGRA": 90.0, "ROLLO PLÁSTICO DESDE VIÑA SANTA RITA": 80.0, "BANDEJAS ENTERAS": 80.0, "BANDEJAS TRITURADAS": 350.0, "FLOTADORES ENTEROS": 300.0, "FLOTADORES TRITURADOS": 300.0, "BALDES ENTEROS": 100.0, "BALDES TRITURADOS": 350.0, "TAPAS ENTEROS": 200.0, "BIDONES ENTEROS SIN PROCESAR": 80.0, "TAMBORES ENTEROS": 90.0, "BIDONES TRITURADOS": 350.0, "BINS": 120.0, "BINS TRITURADOS": 380.0, "BOYAS ENTERAS": 60.0, "BOYAS TRITURADAS": 300.0, "PALLETS ENTEROS": 200.0, "PALLETS TRITURADOS": 400.0, "SOPLADO ENTERO": 90.0, "TUBERÍAS ENTERAS": 80.0, "TUBERÍAS TRITURADAS": 350.0, "TAPAS DE GARRAFÓN ENTERAS": 250.0, "TAPAS DE GARRAFÓN TRITURADAS": 400.0, "ROTOMOLDEO TRITURADO": 350.0, "BOTAS": 200.0, "BLISTER": 253.333333333333, "LAMAS": 253.333333333333, "VENTANAS": 150.0, "TUBERÍAS": 130.0, "CÁPSULA VINO": 250.0, "FILM PESCADO": 80.0, "PEBD COLOR": 33.33, "PEBD TRANSPARENTE": 33.33, "MANGUERA RIEGO ENTERA": 33.33, "MANGUERA RIEGO TRITURADA": 33.33, "TAPA GARRAFÓN ENTERO": 33.33, "TAPA GARRAFÓN MOLIDA": 33.33, "STRETCH FILM": 33.33, "PE EXPANDIDO": 33.33, "PP RÍGIDO ENTERO": 166.66666666666, "PP RÍGIDO TRITURADO": 166.66666666666, "CABOS ENTEROS (PTO MONTT)": 180.0, "CABOS TRITURADOS": 366.666666666667, "GANCHO ROPA": 150.0, "FILM": 77.7777777777778, "MALLA RASCHEL": 77.7777777777778, "MAXISACOS": 77.7777777777778, "RAFIA BLANCA": 44.4, "RAFIA CARBÓN": 44.4, "RAFIA CHICA": 44.4, "RAFIA COLOR": 44.4, "RAFIA GRIS": 44.4, "RAFIA NEGRA": 44.4, "RAFIA BLANCA + PEBD (BBL)": 44.4, "COTONA": 44.4, "CARPETA": 44.4, "CARRETE MOLIDO": 44.4, "CARRETE ENTERO": 44.4, "ZUNCHO PP": 35.0, "EPS SIN PROCESAR": 17.6, "EPS TORTA": 17.6, "EPS GRANEL": 17.6, "EPS TORTA COLOR": 17.6, "EPS TORTA NEGRO": 17.6, "EPS FILTRADO": 17.6, "EPS TORTA FILTRADO": 17.6, "EPS ALMACIGUERA": 17.6, "EPS TORTA ALMACIGUERA": 17.6, "EPS TORTA ALMACIGUERA ANTIGUAS": 17.6, "PAI FARDO CHICOS": 400.0, "PAI FARDO": 400.0, "PAI RAMAS NESTLÉ RECUPAC": 400.0, "PAI FARDO NESTLÉ RECUPAC": 400.0, "PAI FARDO POST CONSUMO": 400.0, "PAI ESTRELLA": 400.0, "PAI ESTRELLA NESTLÉ RECUPAC": 400.0, "PAI RAMA": 400.0, "PAI PROCESADO": 400.0, "PAI CARRETE ENTERO": 400.0, "PAI CARRETE MOLIDO": 400.0, "CRISTAL MOLIDO": 400.0, "CRISTAL ENTERO ANILLO": 400.0, "PAI BANDEJAS ENTERAS": 400.0, "PAI PROCESADO BANDEJAS SOPROLE": 400.0, "PAI ROLLOS": 400.0, "PAI ROLLOS TRITURADOS BLANCO": 400.0, "PAI POST CONSUMO": 400.0, "EPS BLOQUE": 18.0, "GARRAFÓN ENTERO": 50.0, "CD": 50.0, "LAMINA": 50.0, "RAMA": 50.0, "TORTAS Y RAMAS": 50.0, "FIBRA": 300.0, "ROLLOS POLIAMIDA": 500.0, "REDES NYLON": 180.0, "VIRUTA": 550.0, "ALARMAS": 150.0, "FARDO ABS": 400.0, "TRITURADO": 350.0, "MOLIDO": 450.0, "ENTERO": 400.0, "RAFIA + PA FILM": 60.0, "CORCHO": 90.0, "CARTÓN CORRUGADO": 58.3333333333333, "PUERTO MONTT (SIN PROCESAR)": 44.1176470588235, "CON CERA": 44.1176470588235, "ESQUINERO": 44.1176470588235, "CONO TRITURADO": 44.1176470588235, "CONO ENTERO SIN PROCESAR": 44.1176470588235, "CONO ENTERO": 44.1176470588235, "CARTÓN PARA LÍQUIDOS": 72.7272727272727, "BLANCO": 104.0, "REVISTA": 104.0, "DIARIO": 104.0, "CHATARRA": 800.0, "HOJALATA": 300.0, "CABLES ELÉCTRICOS": 300.0, "LATAS DE AEROSOLES": 500.0, "LATAS": 166.666666666667, "CAPSULAS VINO": 200.0, "PALLETS BUENOS": 250.0, "PALLETS MALOS": 200.0, "DESPUNTES": 300.0, "OTRAS MADERAS": 280.0, "MEZCLA DE PAPEL Y CARTÓN": 96.0, "ASIMILABLE A DOMICILIARIO": 42.4242424242424, "INDUSTRIAL": 200.0}, "destino": ["REXIN", "INOCUA VALDIVIA", "VERTEDERO CURACO", "COSEMAR TEMUCO", "KDM LOS ANGELES", "ECOFIBRAS PUERTO MONTT", "ECOFIBRAS SAN BERNARDO", "ZEROCORP"], "familias": ["CARTÓN Y PAPEL", "CAUCHO", "CDR", "DESCARTE", "ELECTRÓNICOS", "ENVASES Y EMBALAJES", "INVENTARIO OBSOLETO", "LODOS", "MADERA", "METALES", "NO RECICLABLES", "PLÁSTICOS", "RECICLABLES", "RESIMPLE", "TEXTIL", "TIERRAS", "VIDRIO"], "plantas": ["San Joaquín"], "tratamientos": ["Valorización", "CDR"], "tipo_kg": {"EPS SIN PROCESAR": {"min": 1, "max": 24000, "avg": 505, "p5": 1, "p95": 1584, "n": 158}, "MEZCLA DE PAPEL Y CARTÓN": {"min": 4, "max": 2880, "avg": 323, "p5": 17, "p95": 1200, "n": 204}, "PEBD TRANSPARENTE": {"min": 5, "max": 23297, "avg": 658, "p5": 10, "p95": 1007, "n": 72}, "CARTÓN PARA LÍQUIDOS": {"min": 0, "max": 1197, "avg": 29, "p5": 2, "p95": 78, "n": 211}, "FILM": {"min": 1, "max": 560, "avg": 48, "p5": 1, "p95": 560, "n": 14}, "BOTELLA TRANSPARENTE": {"min": 1, "max": 2149, "avg": 59, "p5": 3, "p95": 200, "n": 146}, "CABOS ENTEROS (PTO MONTT)": {"min": 1, "max": 5827, "avg": 636, "p5": 1, "p95": 5827, "n": 11}, "FILM PESCADO": {"min": 1, "max": 24573, "avg": 872, "p5": 2, "p95": 2050, "n": 135}, "METALES": {"min": 1, "max": 1320, "avg": 164, "p5": 1, "p95": 1320, "n": 13}, "HOJALATA": {"min": 1, "max": 9000, "avg": 362, "p5": 1, "p95": 2970, "n": 66}, "TUBERÍAS ENTERAS": {"min": 2, "max": 12808, "avg": 1926, "p5": 2, "p95": 12808, "n": 18}, "VIDRIO": {"min": 11, "max": 313, "avg": 97, "p5": 11, "p95": 313, "n": 19}, "RAFIA BLANCA": {"min": 5, "max": 19807, "avg": 3457, "p5": 15, "p95": 17676, "n": 88}, "PAPEL Y CARTÓN": {"min": 2, "max": 167, "avg": 59, "p5": 2, "p95": 167, "n": 13}, "BIDONES ENTEROS SIN PROCESAR": {"min": 5, "max": 5094, "avg": 284, "p5": 16, "p95": 700, "n": 67}, "LATAS DE AEROSOLES": {"min": 4, "max": 70, "avg": 34, "p5": 4, "p95": 70, "n": 6}, "LATAS": {"min": 1, "max": 110, "avg": 17, "p5": 1, "p95": 30, "n": 32}, "BOTELLA COLOR": {"min": 10, "max": 1300, "avg": 98, "p5": 10, "p95": 1300, "n": 18}, "PEBD COLOR": {"min": 1, "max": 13834, "avg": 530, "p5": 3, "p95": 1320, "n": 53}, "TAPAS DE GARRAFÓN ENTERAS": {"min": 2, "max": 3730, "avg": 546, "p5": 2, "p95": 3730, "n": 10}, "RESIDUOS ORGÁNICOS": {"min": 458, "max": 1230, "avg": 822, "p5": 458, "p95": 1230, "n": 12}, "CDR": {"min": 30, "max": 475, "avg": 225, "p5": 30, "p95": 440, "n": 36}, "BOTAS": {"min": 12, "max": 3283, "avg": 494, "p5": 12, "p95": 3283, "n": 8}, "ZUNCHO PET": {"min": 15, "max": 89, "avg": 43, "p5": 15, "p95": 89, "n": 6}, "BANDEJAS ENTERAS": {"min": 8, "max": 228, "avg": 69, "p5": 8, "p95": 228, "n": 11}, "RESIDUOS NO VALORIZABLES": {"min": 71, "max": 19678, "avg": 4939, "p5": 71, "p95": 19678, "n": 28}, "TEXTIL": {"min": 208, "max": 495, "avg": 322, "p5": 208, "p95": 495, "n": 5}, "EPS BLOQUE": {"min": 327, "max": 28521, "avg": 18041, "p5": 327, "p95": 28521, "n": 3}, "BOYAS ENTERAS": {"min": 1200, "max": 4320, "avg": 3104, "p5": 1200, "p95": 4320, "n": 11}, "TAMBORES ENTEROS": {"min": 10, "max": 2295, "avg": 273, "p5": 20, "p95": 775, "n": 25}, "TUBERÍAS": {"min": 6, "max": 120, "avg": 71, "p5": 6, "p95": 120, "n": 3}, "MIX RESIMPLE": {"min": 6, "max": 25634, "avg": 587, "p5": 25, "p95": 1054, "n": 176}, "TAPAS ENTEROS": {"min": 185, "max": 3634, "avg": 1110, "p5": 185, "p95": 3634, "n": 4}, "EPS TORTA": {"min": 1, "max": 150, "avg": 67, "p5": 1, "p95": 150, "n": 3}, "GARRAFÓN ENTERO": {"min": 515, "max": 5129, "avg": 1347, "p5": 515, "p95": 5129, "n": 7}, "NEUMÁTICOS FUERA DE USO": {"min": 4550, "max": 10424, "avg": 6781, "p5": 4550, "p95": 10424, "n": 4}, "CONO ENTERO": {"min": 662, "max": 1292, "avg": 977, "p5": 662, "p95": 1292, "n": 2}, "PLÁSTICOS": {"min": 121, "max": 662, "avg": 482, "p5": 121, "p95": 662, "n": 3}, "FLOTADORES TRITURADOS": {"min": 14211, "max": 30000, "avg": 19738, "p5": 14211, "p95": 30000, "n": 3}, "CARTÓN CORRUGADO": {"min": 5, "max": 28589, "avg": 606, "p5": 10, "p95": 1320, "n": 152}, "BIDONES TRITURADOS": {"min": 126, "max": 1025, "avg": 585, "p5": 126, "p95": 1025, "n": 4}, "ASIMILABLE A DOMICILIARIO": {"min": 10, "max": 509, "avg": 260, "p5": 10, "p95": 509, "n": 2}, "STRETCH FILM": {"min": 6, "max": 25484, "avg": 3198, "p5": 6, "p95": 25484, "n": 8}, "BLANCO": {"min": 2380, "max": 22978, "avg": 12679, "p5": 2380, "p95": 22978, "n": 2}}};
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 /* >>> PEGA AQUÍ LA URL DE TU APPS SCRIPT (entre comillas) <<< */
 const CENTRAL_URL="";
 
-const ICOLS=[
- {k:'fecha',l:'Fecha',t:'date',req:1,w:110},
- {k:'mes',l:'Mes',t:'auto',w:68},
- {k:'movimiento',l:'Movimiento',t:'sel',req:1,opts:'movimiento',w:100},
- {k:'cliente',l:'Cliente',t:'dl',req:1,dl:'dl_cliente',w:160},
- {k:'rutCli',l:'RUT',t:'auto',w:100},
- {k:'transportista',l:'Transportista',t:'dl',dl:'dl_transportista',w:150},
- {k:'patente',l:'Patente',t:'txt',w:80,upper:1},
- {k:'generador',l:'Generador',t:'dl',dl:'dl_generador',w:150},
- {k:'conductor',l:'Conductor',t:'txt',w:110},
- {k:'guiaEco',l:'Guía Eco.',t:'txt',w:95},
- {k:'guiaCli',l:'Guía Cliente',t:'txt',w:100},
- {k:'ticket',l:'Ticket',t:'txt',w:90},
- {k:'tipo',l:'Tipo Residuo',t:'dl',req:1,dl:'dl_tipo',w:180,line:1},
- {k:'material',l:'Material',t:'auto',w:115,line:1},
- {k:'familia',l:'Familia',t:'auto',w:115,line:1},
- {k:'formato',l:'Formato',t:'sel',req:1,opts:'formato',w:100,line:1},
- {k:'proceso',l:'Proceso',t:'sel',opts:'proceso',w:115,line:1},
- {k:'volumen',l:'Vol. m³',t:'num',w:75,line:1},
- {k:'_dens',l:'Dens.',t:'auto',w:60,noSave:1,line:1},
- {k:'kg',l:'Peso KG',t:'num',req:1,w:90,line:1},
- {k:'ton',l:'Ton',t:'auto',w:70,line:1},
- {k:'destino',l:'Destino',t:'sel',opts:'destino',w:105,line:1},
- {k:'tarUf',l:'Tarifa UF',t:'num',w:80,line:1,extra:1},
- {k:'tarClp',l:'Tarifa CLP',t:'num',w:82,line:1,extra:1},
- {k:'obs',l:'Obs.',t:'txt',w:160,line:1,extra:1},
- {k:'factura',l:'N° Factura',t:'txt',w:90,line:1,extra:1},
- {k:'monto',l:'Monto',t:'num',w:80,line:1,extra:1},
- {k:'mesFact',l:'Mes Fact.',t:'txt',w:85,line:1,extra:1},
-];
-const SCOLS=[
- {k:'tipoGestion',l:'Tipo Gestión',t:'sel',req:1,opts:'gestion',w:115},
- {k:'planta',l:'Planta',t:'sel',opts:'plantas',w:100},
- {k:'fecha',l:'Fecha',t:'date',req:1,w:110},
- {k:'mes',l:'Mes',t:'auto',w:68},
- {k:'destinatario',l:'Destinatario',t:'dl',req:1,dl:'dl_destinatario',w:180},
- {k:'rutCli',l:'RUT',t:'auto',w:100},
- {k:'guia',l:'N° Guía',t:'txt',w:90},
- {k:'transportista',l:'Transportista',t:'dl',dl:'dl_transportista',w:150},
- {k:'patente',l:'Patente',t:'txt',w:80,upper:1},
- {k:'conductor',l:'Conductor',t:'txt',w:110},
- {k:'tipo',l:'Tipo',t:'dl',req:1,dl:'dl_tipo',w:180,line:1},
- {k:'material',l:'Material',t:'auto',w:115,line:1},
- {k:'familia',l:'Familia',t:'auto',w:115,line:1},
- {k:'volumen',l:'Vol. m³',t:'num',w:75,line:1},
- {k:'_dens',l:'Dens.',t:'auto',w:60,noSave:1,line:1},
- {k:'kg',l:'Peso KG',t:'num',req:1,w:90,line:1},
- {k:'ton',l:'Ton',t:'auto',w:70,line:1},
- {k:'formato',l:'Formato',t:'sel',req:1,opts:'formato',w:100,line:1},
- {k:'pesoFinal',l:'Peso Final',t:'num',w:85,line:1},
- {k:'tratamiento',l:'Tratamiento',t:'sel',opts:'tratamientos',w:115,line:1},
- {k:'tarUsd',l:'Tarifa USD',t:'num',w:80,line:1,extra:1},
- {k:'tarClp',l:'Tarifa CLP',t:'num',w:82,line:1,extra:1},
- {k:'obs',l:'Obs.',t:'txt',w:160,line:1,extra:1},
- {k:'factura',l:'N° Factura',t:'txt',w:90,line:1,extra:1},
- {k:'monto',l:'Monto',t:'num',w:80,line:1,extra:1},
- {k:'mesFact',l:'Mes Fact.',t:'txt',w:85,line:1,extra:1},
-];
-const EXP_INGRESO={H:['FECHA','MES','MOVIMIENTO','RUT CLIENTE','CLIENTE','TRANSPORTISTA','GENERADOR','N° GUÍA ECOFIBRAS','N° GUÍA CLIENTE','TICKET DE PESAJE','PATENTE','CONDUCTOR','TIPO RESIDUO','MATERIAL','FAMILIA','FORMATO','PROCESO','VOLUMEN [M3]','PESO NETO KG','PESO NETO TON','DESTINO','TARIFA [UF/KG]','TARIFA [CLP/KG]','OBSERVACIONES','N° FACTURA','MONTO FACTURA','MES DE FACTURACIÓN','HORA'],
- K:['fecha','mes','movimiento','rutCli','cliente','transportista','generador','guiaEco','guiaCli','ticket','patente','conductor','tipo','material','familia','formato','proceso','volumen','kg','ton','destino','tarUf','tarClp','obs','factura','monto','mesFact','hora']};
-const EXP_SALIDA={H:['TIPO GESTIÓN','PLANTA','FECHA','MES','RUT','DESTINATARIO','N° DE GUÍA','TRANSPORTISTA','PATENTE DE CAMIÓN','CONDUCTOR','TIPO','MATERIAL','FAMILIA','VOLUMEN [M3]','PESO NETO [KG]','PESO NETO [TON]','FORMATO','PESO FINAL CLIENTE','TARIFA [USD/KG]','TARIFA [CLP/KG]','TRATAMIENTO','OBSERVACIONES','N° FACTURA','MONTO FACTURA','MES DE FACTURACIÓN','HORA'],
- K:['tipoGestion','planta','fecha','mes','rutCli','destinatario','guia','transportista','patente','conductor','tipo','material','familia','volumen','kg','ton','formato','pesoFinal','tarUsd','tarClp','tratamiento','obs','factura','monto','mesFact','hora']};
-
-const $=id=>document.getElementById(id);
-window.onerror=function(m){try{const w=document.getElementById('warnBar');if(w){w.innerHTML='<div class="w-row w-err">⚠ Error: '+m+'</div>';w.classList.add('show');}}catch(e){}};
+window.onerror=function(m){try{const w=document.getElementById('lineWarns');if(w){w.innerHTML='<div class="w-row err">⚠ Error: '+m+'</div>';}}catch(e){}};
 const LS={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
-function loadJSON(k,def){try{const v=LS.get(k);return v?JSON.parse(v):def;}catch(e){return def;}}
-let mode='ingreso',cols=ICOLS;
-let store={ingreso:[],salida:[]};
-let learn={p2c:{},c2t:{},ranges:{}};
-let audit=[];
-let pesoAuto=true,showExtra=false;
-const recs=()=>store[mode];
-
-function fillList(id,arr){$(id).innerHTML=arr.map(v=>`<option value="${(v||'').replace(/"/g,'&quot;')}">`).join('');}
-function fillSel(el,arr,ph){if(!el)return;el.innerHTML=(ph?`<option value="">${ph}</option>`:'')+arr.map(v=>`<option>${v}</option>`).join('');}
+function loadJSON(k,d){try{const v=LS.get(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+const $=id=>document.getElementById(id);
 function num(v){if(v==null)return NaN;v=String(v).trim().replace(',','.');return v===''?NaN:Number(v);}
 function esc(s){return (s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));}
 function fmt(v){const n=Number(v);return isNaN(n)?(v||'—'):n.toLocaleString('es-CL',{maximumFractionDigits:3});}
 
-function init(){
-  fillList('dl_cliente',Object.keys(CONFIG.clientes));fillList('dl_destinatario',Object.keys(CONFIG.destinatarios));
-  fillList('dl_transportista',Object.keys(CONFIG.transporte));fillList('dl_generador',CONFIG.generadores);
-  fillList('dl_tipo',Object.keys(CONFIG.tipo_to_material));
-  document.querySelectorAll('#modesel button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
-  store.ingreso=loadJSON('eco_ingreso',[]);
-  store.salida=loadJSON('eco_salida',[]);
-  learn=Object.assign({p2c:{},c2t:{},ranges:{}},loadJSON('eco_learn',{}));
-  audit=loadJSON('eco_audit',[]);
-  document.body.classList.add('hide-extra');
-  $('newBtn').addEventListener('click',clearAll);
-  $('expBtn').addEventListener('click',exportData);
-  $('extraBtn').addEventListener('click',toggleExtra);
-  $('histBtn').addEventListener('click',showHist);
-  $('histX').addEventListener('click',()=>$('histModal').classList.remove('show'));
-  $('histModal').addEventListener('click',e=>{if(e.target===$('histModal'))$('histModal').classList.remove('show');});
-  setMode('ingreso');
-  flushPending();
-}
-function persist(){LS.set('eco_'+mode,JSON.stringify(recs()));}
-function saveLearn(){LS.set('eco_learn',JSON.stringify(learn));}
-function saveAudit(){LS.set('eco_audit',JSON.stringify(audit.slice(0,300)));}
+/* ===== CAMPOS =====
+   ent = cabecera de la entrega · line = por material · extra = facturación (colapsado) */
+const F_ING={
+ ent:[
+  {k:'fecha',l:'Fecha',t:'date',req:1},
+  {k:'movimiento',l:'Movimiento',t:'sel',req:1,opts:'movimiento'},
+  {k:'cliente',l:'Cliente',t:'dl',req:1,dl:'dl_cliente'},
+  {k:'rutCli',l:'RUT Cliente',t:'ro'},
+  {k:'transportista',l:'Transportista',t:'dl',dl:'dl_transportista'},
+  {k:'patente',l:'Patente',t:'txt',upper:1},
+  {k:'conductor',l:'Conductor',t:'txt'},
+  {k:'generador',l:'Generador',t:'dl',dl:'dl_generador'},
+  {k:'guiaEco',l:'N° Guía Ecofibras',t:'txt'},
+  {k:'guiaCli',l:'N° Guía Cliente',t:'txt'},
+  {k:'ticket',l:'Ticket de pesaje',t:'txt'},
+ ],
+ line:[
+  {k:'tipo',l:'Tipo de residuo',t:'dl',req:1,dl:'dl_tipo'},
+  {k:'material',l:'Material',t:'ro'},
+  {k:'familia',l:'Familia',t:'ro'},
+  {k:'formato',l:'Formato',t:'sel',req:1,opts:'formato'},
+  {k:'proceso',l:'Proceso',t:'sel',opts:'proceso'},
+  {k:'volumen',l:'Volumen (m³)',t:'num'},
+  {k:'kg',l:'Peso neto (kg)',t:'num',req:1},
+  {k:'ton',l:'Toneladas',t:'ro'},
+  {k:'destino',l:'Destino',t:'sel',opts:'destino'},
+ ],
+ extra:[
+  {k:'tarUf',l:'Tarifa UF/kg',t:'num'},{k:'tarClp',l:'Tarifa CLP/kg',t:'num'},
+  {k:'obs',l:'Observaciones',t:'txt'},{k:'factura',l:'N° Factura',t:'txt'},
+  {k:'monto',l:'Monto factura',t:'num'},{k:'mesFact',l:'Mes facturación',t:'txt'},
+ ]};
+const F_SAL={
+ ent:[
+  {k:'tipoGestion',l:'Tipo gestión',t:'sel',req:1,opts:'gestion'},
+  {k:'planta',l:'Planta',t:'sel',opts:'plantas'},
+  {k:'fecha',l:'Fecha',t:'date',req:1},
+  {k:'destinatario',l:'Destinatario',t:'dl',req:1,dl:'dl_destinatario'},
+  {k:'rutCli',l:'RUT',t:'ro'},
+  {k:'guia',l:'N° de guía',t:'txt'},
+  {k:'transportista',l:'Transportista',t:'dl',dl:'dl_transportista'},
+  {k:'patente',l:'Patente',t:'txt',upper:1},
+  {k:'conductor',l:'Conductor',t:'txt'},
+ ],
+ line:[
+  {k:'tipo',l:'Tipo',t:'dl',req:1,dl:'dl_tipo'},
+  {k:'material',l:'Material',t:'ro'},
+  {k:'familia',l:'Familia',t:'ro'},
+  {k:'formato',l:'Formato',t:'sel',req:1,opts:'formato'},
+  {k:'volumen',l:'Volumen (m³)',t:'num'},
+  {k:'kg',l:'Peso neto (kg)',t:'num',req:1},
+  {k:'ton',l:'Toneladas',t:'ro'},
+  {k:'pesoFinal',l:'Peso final cliente',t:'num'},
+  {k:'tratamiento',l:'Tratamiento',t:'sel',opts:'tratamientos'},
+ ],
+ extra:[
+  {k:'tarUsd',l:'Tarifa USD/kg',t:'num'},{k:'tarClp',l:'Tarifa CLP/kg',t:'num'},
+  {k:'obs',l:'Observaciones',t:'txt'},{k:'factura',l:'N° Factura',t:'txt'},
+  {k:'monto',l:'Monto factura',t:'num'},{k:'mesFact',l:'Mes facturación',t:'txt'},
+ ]};
+const EXP_INGRESO={H:['FECHA','MES','MOVIMIENTO','RUT CLIENTE','CLIENTE','TRANSPORTISTA','GENERADOR','N° GUÍA ECOFIBRAS','N° GUÍA CLIENTE','TICKET DE PESAJE','PATENTE','CONDUCTOR','TIPO RESIDUO','MATERIAL','FAMILIA','FORMATO','PROCESO','VOLUMEN [M3]','PESO NETO KG','PESO NETO TON','DESTINO','TARIFA [UF/KG]','TARIFA [CLP/KG]','OBSERVACIONES','N° FACTURA','MONTO FACTURA','MES DE FACTURACIÓN','HORA'],
+ K:['fecha','mes','movimiento','rutCli','cliente','transportista','generador','guiaEco','guiaCli','ticket','patente','conductor','tipo','material','familia','formato','proceso','volumen','kg','ton','destino','tarUf','tarClp','obs','factura','monto','mesFact','hora']};
+const EXP_SALIDA={H:['TIPO GESTIÓN','PLANTA','FECHA','MES','RUT','DESTINATARIO','N° DE GUÍA','TRANSPORTISTA','PATENTE DE CAMIÓN','CONDUCTOR','TIPO','MATERIAL','FAMILIA','VOLUMEN [M3]','PESO NETO [KG]','PESO NETO [TON]','FORMATO','PESO FINAL CLIENTE','TARIFA [USD/KG]','TARIFA [CLP/KG]','TRATAMIENTO','OBSERVACIONES','N° FACTURA','MONTO FACTURA','MES DE FACTURACIÓN','HORA'],
+ K:['tipoGestion','planta','fecha','mes','rutCli','destinatario','guia','transportista','patente','conductor','tipo','material','familia','volumen','kg','ton','formato','pesoFinal','tarUsd','tarClp','tratamiento','obs','factura','monto','mesFact','hora']};
+const REC_COLS={
+ ingreso:[['fecha','Fecha'],['cliente','Cliente'],['tipo','Tipo'],['material','Material'],['formato','Formato'],['volumen','Vol m³'],['kg','KG'],['ton','Ton'],['guiaEco','Guía Eco'],['ticket','Ticket'],['patente','Patente'],['hora','Hora']],
+ salida:[['fecha','Fecha'],['destinatario','Destinatario'],['tipo','Tipo'],['material','Material'],['formato','Formato'],['kg','KG'],['ton','Ton'],['guia','Guía'],['patente','Patente'],['hora','Hora']]};
 
-function setMode(m){
-  mode=m;cols=(m==='ingreso'?ICOLS:SCOLS);pesoAuto=true;
-  document.querySelectorAll('#modesel button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-  buildTable(cols);fillEntrySelects(cols);
-  const fe=$('e_fecha');if(fe)fe.value=new Date().toISOString().slice(0,10);updMes();
-  renderRecs();updSync();updKpis();
-}
-function toggleExtra(){showExtra=!showExtra;document.body.classList.toggle('hide-extra',!showExtra);$('extraBtn').textContent=showExtra?'− Ocultar facturación':'+ Facturación';$('extraBtn').classList.toggle('on',showExtra);
-  const w=document.querySelector('.tbl-wrap');if(w){if(showExtra)setTimeout(()=>w.scrollTo({left:w.scrollWidth,behavior:'smooth'}),60);else w.scrollTo({left:0,behavior:'smooth'});}}
+let mode='ingreso';
+let store={ingreso:[],salida:[]};
+let learn={p2c:{},c2t:{},ranges:{}};
+let audit=[];
+let lines=[];        // líneas pendientes de la entrega actual
+let pesoAuto=true, showExtra=false;
+const recs=()=>store[mode];
+const FDEF=()=>mode==='ingreso'?F_ING:F_SAL;
 
-let gstartSet=new Set();
-function grpOf(c){return c.extra?'extra':(c.line?'material':'entrega');}
-function grpLabel(g){if(g==='material')return 'Material y peso';if(g==='extra')return 'Facturación';return mode==='ingreso'?'Datos de la entrega':'Datos de la salida';}
-function buildTable(cols){
-  // agrupar columnas contiguas
-  const groups=[];cols.forEach(c=>{const g=grpOf(c);const last=groups[groups.length-1];if(last&&last.g===g){last.span++;last.extra=last.extra&&!!c.extra;}else groups.push({g,span:1,extra:!!c.extra});});
-  gstartSet=new Set();let acc=0;groups.forEach((gr,j)=>{if(j>0)gstartSet.add(acc);acc+=gr.span;});
-  // fila 1: grupos
-  let r1='<tr><th class="col-pin" rowspan="2" style="width:42px;min-width:42px"></th>';
-  groups.forEach((gr,gi)=>{r1+=`<th colspan="${gr.span}" class="grp grp-${gr.g}${gr.extra?' col-extra':''}${gi>0?' grp-edge':''}">${grpLabel(gr.g)}</th>`;});
-  r1+='<th rowspan="2" style="width:36px"></th></tr>';
-  // fila 2: nombres de columna
-  let r2='<tr>'+cols.map((c,i)=>{
-    const cl=[];if(c.req)cl.push('th-req');if(c.extra)cl.push('col-extra');if(gstartSet.has(i))cl.push('grp-edge');
-    return `<th${cl.length?' class="'+cl.join(' ')+'"':''} style="min-width:${c.w}px;width:${c.w}px">${c.l}</th>`;
-  }).join('')+'</tr>';
-  $('thead').innerHTML=r1+r2;
-  // fila de ingreso
-  let cells='<td class="col-pin"><div class="save-cell"><button id="saveBtn" disabled title="Guardar línea (Enter)">✓</button></div></td>';
-  cols.forEach((c,i)=>{
-    const extra=c.extra?' col-extra':'';const edge=gstartSet.has(i)?' grp-edge':'';
-    if(c.t==='auto'){cells+=`<td id="ev_${c.k}" class="c-auto${extra}${edge}" style="min-width:${c.w}px"></td>`;}
-    else{
-      const cls='cell-inp'+(c.t==='num'?' mono':'')+(c.upper?' upper':'');
-      let inp='';
-      if(c.t==='date')inp=`<input id="e_${c.k}" type="date" class="${cls}">`;
-      else if(c.t==='sel')inp=`<select id="e_${c.k}" class="${cls}"><option value="">—</option></select>`;
-      else if(c.t==='dl')inp=`<input id="e_${c.k}" list="${c.dl}" class="${cls}" autocomplete="off" placeholder="…">`;
-      else inp=`<input id="e_${c.k}" class="${cls}" autocomplete="off">`;
-      cells+=`<td id="td_${c.k}" class="${(extra+edge).trim()}" style="min-width:${c.w}px">${inp}</td>`;
-    }
-  });
-  cells+='<td></td>';
-  const tr=document.createElement('tr');tr.className='entry';tr.innerHTML=cells;
-  $('entryBody').innerHTML='';$('entryBody').appendChild(tr);
-  attachListeners(cols);
+function fillList(id,arr){$(id).innerHTML=arr.map(v=>`<option value="${(v||'').replace(/"/g,'&quot;')}">`).join('');}
+function fillSel(el,arr){el.innerHTML='<option value="">—</option>'+arr.map(v=>`<option>${v}</option>`).join('');}
+
+function fieldHTML(c){
+  const req=c.req?'<span class="req-dot" id="rq_'+c.k+'"></span>':'';
+  const auto=c.t==='ro'?'<span class="auto-tag">AUTO</span>':'';
+  let inp='';
+  const base='id="f_'+c.k+'" autocomplete="off"';
+  if(c.t==='date')inp=`<input ${base} type="date">`;
+  else if(c.t==='sel')inp=`<select ${base}></select>`;
+  else if(c.t==='dl')inp=`<input ${base} list="${c.dl}" placeholder="Escribe para buscar…">`;
+  else if(c.t==='ro')inp=`<input ${base} readonly tabindex="-1" placeholder="—">`;
+  else if(c.t==='num')inp=`<input ${base} inputmode="decimal" placeholder="0">`;
+  else inp=`<input ${base}${c.upper?' style="text-transform:uppercase"':''}>`;
+  return `<div class="f${c.extra?' fx':''}" id="fw_${c.k}"><label>${req}${c.l}${auto}</label>${inp}</div>`;
 }
-function fillEntrySelects(cols){cols.forEach(c=>{if(c.t==='sel'){const el=$('e_'+c.k);if(el&&CONFIG[c.opts])fillSel(el,CONFIG[c.opts],'—');}});}
-function attachListeners(cols){
-  const inp=(k)=>$('e_'+k);
-  const on=(k,fn)=>{const e=inp(k);if(e){e.addEventListener('input',fn);e.addEventListener('change',fn);}};
-  on('fecha',()=>{updMes();validate();updKpis();});
-  on('cliente',()=>{const r=CONFIG.clientes[eiv('cliente')];if(r&&r!=='0')setAuto('rutCli',r);showSuggs(eiv('cliente'));validate();});
-  on('destinatario',()=>{const r=CONFIG.destinatarios[eiv('destinatario')];if(r&&r!=='0')setAuto('rutCli',r);showSuggs(eiv('destinatario'));validate();});
-  on('transportista',()=>{const t=CONFIG.transporte[eiv('transportista')];if(t&&t.patente&&t.patente!=='0'&&!eiv('patente')){const pe=inp('patente');if(pe)pe.value=t.patente.toUpperCase();}validate();});
-  on('patente',()=>{
-    const p=(eiv('patente')||'').toUpperCase();
-    const n=CONFIG.pat2tr[p];const te=inp('transportista');if(n&&te&&!te.value.trim())te.value=n;
-    const d=learn.p2c[p];const ce=inp('conductor');if(d&&ce&&!ce.value.trim())ce.value=d;
-    validate();
-  });
-  on('tipo',()=>{updTipo();autoPeso();validate();});
-  on('volumen',()=>{autoPeso();validate();});
+function buildForm(){
+  const D=FDEF();
+  $('entGrid').innerHTML=D.ent.map(fieldHTML).join('');
+  $('lineGrid').innerHTML=D.line.map(fieldHTML).join('')+D.extra.map(c=>fieldHTML(Object.assign({extra:1},c))).join('');
+  document.querySelectorAll('.fx').forEach(el=>el.classList.toggle('hideS',!showExtra));
+  D.ent.concat(D.line,D.extra).forEach(c=>{if(c.t==='sel'){const el=$('f_'+c.k);if(el&&CONFIG[c.opts])fillSel(el,CONFIG[c.opts]);}});
+  $('hdrEnt').textContent=mode==='ingreso'?'Datos de la entrega':'Datos de la salida';
+  const fe=$('f_fecha');if(fe)fe.value=new Date().toISOString().slice(0,10);
+  attach();
+  renderLines();validate();
+}
+const fv=k=>{const e=$('f_'+k);return e?(e.value||'').trim():'';};
+const setF=(k,v)=>{const e=$('f_'+k);if(e)e.value=(v==null?'':v);};
+
+function attach(){
+  const on=(k,fn)=>{const e=$('f_'+k);if(e){e.addEventListener('input',fn);e.addEventListener('change',fn);}};
+  on('cliente',()=>{const r=CONFIG.clientes[fv('cliente')];setF('rutCli',(r&&r!=='0')?r:'');showSuggs(fv('cliente'));validate();});
+  on('destinatario',()=>{const r=CONFIG.destinatarios[fv('destinatario')];setF('rutCli',(r&&r!=='0')?r:'');showSuggs(fv('destinatario'));validate();});
+  on('transportista',()=>{const t=CONFIG.transporte[fv('transportista')];if(t&&t.patente&&t.patente!=='0'&&!fv('patente'))setF('patente',t.patente.toUpperCase());validate();});
+  on('patente',()=>{const p=fv('patente').toUpperCase();const n=CONFIG.pat2tr[p];if(n&&!fv('transportista'))setF('transportista',n);
+    const d=learn.p2c[p];if(d&&!fv('conductor'))setF('conductor',d);validate();});
+  on('tipo',()=>{const t=fv('tipo'),mat=CONFIG.tipo_to_material[t]||'',fam=mat?(CONFIG.material_to_familia[mat]||''):'';
+    setF('material',mat);setF('familia',fam);pesoAuto=true;autoPeso();validate();});
+  on('volumen',()=>{pesoAuto=true;autoPeso();validate();});
   on('kg',()=>{pesoAuto=false;updTon();validate();});
-  cols.forEach(c=>{if(c.t==='sel'||c.t==='dl'||c.t==='txt'){const e=inp(c.k);if(e&&!['cliente','destinatario','transportista','patente','tipo'].includes(c.k))e.addEventListener('input',validate);}});
-  const saveB=$('saveBtn');if(saveB)saveB.addEventListener('click',saveRow);
-  // navegación con flechas ← → entre celdas (y Enter para guardar)
-  const focusables=cols.filter(c=>c.t!=='auto').map(c=>'e_'+c.k);
-  function moveFocus(curId,dir){
-    const i=focusables.indexOf(curId);if(i<0)return;
-    let j=i+dir;while(j>=0&&j<focusables.length){const el=$(focusables[j]);if(el&&el.offsetParent!==null){el.focus();if(el.select)try{el.select();}catch(_){}; return;}j+=dir;}
-  }
-  cols.filter(c=>c.t!=='auto').forEach(c=>{
-    const el=inp(c.k);if(!el)return;
-    el.addEventListener('keydown',e=>{
-      if(e.key==='Enter'){if(saveB&&!saveB.disabled){e.preventDefault();saveRow();}return;}
-      if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
-      const isSel=(el.tagName==='SELECT'||el.type==='date');
-      let atEnd=true,atStart=true;
-      if(!isSel){try{const s=el.selectionStart,en=el.selectionEnd,L=(el.value||'').length;if(s!=null){atEnd=(s===L&&en===L);atStart=(s===0&&en===0);}}catch(_){atEnd=true;atStart=true;}}
-      if(e.key==='ArrowRight'&&(isSel||atEnd)){e.preventDefault();moveFocus('e_'+c.k,1);}
-      else if(e.key==='ArrowLeft'&&(isSel||atStart)){e.preventDefault();moveFocus('e_'+c.k,-1);}
-    });
+  FDEF().ent.concat(FDEF().line,FDEF().extra).forEach(c=>{
+    if(!['cliente','destinatario','transportista','patente','tipo','volumen','kg'].includes(c.k)&&c.t!=='ro')on(c.k,validate);
+  });
+  // Enter en campos de línea = añadir línea
+  FDEF().line.concat(FDEF().extra).forEach(c=>{
+    const e=$('f_'+c.k);if(!e)return;
+    e.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();if(!$('addLineBtn').disabled)addLine();}});
   });
 }
-const eiv=k=>{const e=$('e_'+k);return e?(e.value||'').trim():'';};
-const setAuto=(k,v)=>{const e=$('ev_'+k);if(e)e.textContent=(v==null?'':String(v));};
-const getAuto=k=>{const e=$('ev_'+k);return e?e.textContent.trim():'';};
-function updMes(){const v=eiv('fecha');setAuto('mes',v?MESES[parseInt(v.slice(5,7),10)-1]:'');}
-function updTipo(){
-  const t=eiv('tipo'),mat=CONFIG.tipo_to_material[t]||'',fam=mat?CONFIG.material_to_familia[mat]||'':'';
-  setAuto('material',mat);setAuto('familia',fam);
-  const d=CONFIG.tipo_dens[t];setAuto('_dens',d!=null?d:'');
-}
-function updTon(){const kg=num(eiv('kg'));setAuto('ton',isNaN(kg)?'':(kg/1000).toLocaleString('es-CL',{maximumFractionDigits:3}));}
 function autoPeso(){
-  const t=eiv('tipo'),d=CONFIG.tipo_dens[t],vol=num(eiv('volumen'));
-  if(d!=null&&!isNaN(vol)&&pesoAuto){const kg=Math.round(vol*d);const ke=$('e_kg');if(ke){ke.value=String(kg);}}
+  const t=fv('tipo'),d=CONFIG.tipo_dens[t],vol=num(fv('volumen'));
+  if(pesoAuto&&d!=null&&!isNaN(vol)&&vol>0)setF('kg',String(Math.round(vol*d)));
   updTon();
 }
+function updTon(){const kg=num(fv('kg'));setF('ton',isNaN(kg)?'':(kg/1000).toLocaleString('es-CL',{maximumFractionDigits:3}));}
 
-/* CHEQUEOS INTELIGENTES */
-function dupCheck(){
-  const f=eiv('fecha'),c=mode==='ingreso'?eiv('cliente'):eiv('destinatario'),m=getAuto('material'),kgN=num(eiv('kg'));
-  if(!f||!c||!m||isNaN(kgN))return '';
-  const dup=recs().find(r=>r.fecha===f&&((r.cliente||r.destinatario)===c)&&r.material===m&&Number(r.kg)===kgN);
-  return dup?`⚠ Posible duplicado: hoy ya hay un ${m} de ${c} con ${kgN.toLocaleString('es-CL')} kg`:'';
+/* chequeos */
+function lineChecks(){
+  const out=[];
+  const t=fv('tipo'),kg=num(fv('kg')),vol=num(fv('volumen')),d=CONFIG.tipo_dens[t];
+  if(!isNaN(kg)){
+    if(kg<=0)out.push({err:1,m:'El peso debe ser mayor que 0.'});
+    if(kg>30000)out.push({err:1,m:'⛔ Supera 30 toneladas (30.000 kg) — más que un camión. Corrígelo para poder añadir.'});
+    if(d!=null&&!isNaN(vol)&&vol>0){const exp=vol*d;if(Math.abs(kg-exp)/exp>0.30)out.push({m:`⚠ Peso muy distinto al esperado: vol × densidad ≈ ${Math.round(exp).toLocaleString('es-CL')} kg`});}
+    const h=CONFIG.tipo_kg&&CONFIG.tipo_kg[t];
+    if(h){if(kg>h.p95*2.5)out.push({m:`⚠ Peso inusualmente ALTO para "${t}" — normalmente hasta ~${h.p95.toLocaleString('es-CL')} kg (${h.n} registros históricos)`});
+      else if(h.p5>10&&kg<h.p5*0.4)out.push({m:`⚠ Peso inusualmente BAJO para "${t}" — normalmente desde ~${h.p5.toLocaleString('es-CL')} kg`});}
+    const r=learn.ranges[t];if(r&&r.n>=5){const avg=r.sum/r.n;if(kg<avg*0.3||kg>avg*3)out.push({m:`⚠ Peso fuera de lo habitual para "${t}" (promedio de uso ≈ ${Math.round(avg).toLocaleString('es-CL')} kg)`});}
+    // duplicado: mismo día+cliente+material+kg en guardados o en líneas pendientes
+    const f=fv('fecha'),c=mode==='ingreso'?fv('cliente'):fv('destinatario'),mat=fv('material');
+    if(f&&c&&mat){
+      if(recs().some(r2=>r2.fecha===f&&(r2.cliente||r2.destinatario)===c&&r2.material===mat&&Number(r2.kg)===kg))
+        out.push({m:`⚠ Posible duplicado: hoy ya guardaste un ${mat} de ${c} con ${kg.toLocaleString('es-CL')} kg`});
+      else if(lines.some(L=>L.material===mat&&Number(L.kg)===kg))
+        out.push({m:`⚠ Ya añadiste una línea igual (${mat}, ${kg.toLocaleString('es-CL')} kg) a esta entrega`});
+    }
+  }
+  return out;
 }
-function sanityCheck(){
-  const t=eiv('tipo'),vol=num(eiv('volumen')),kg=num(eiv('kg')),d=CONFIG.tipo_dens[t];
-  if(!t||isNaN(kg))return '';
-  if(kg<=0)return '⚠ El peso debe ser mayor que 0';
-  // 1) contra volumen × densidad
-  if(d!=null&&!isNaN(vol)&&vol>0){
-    const exp=vol*d,delta=Math.abs(kg-exp)/exp;
-    if(delta>0.30)return `⚠ Peso muy distinto al esperado · vol × densidad ≈ ${Math.round(exp).toLocaleString('es-CL')} kg`;
-  }
-  // 2) contra lo aprendido en el uso
-  const r=learn.ranges[t];
-  if(r&&r.n>=5){const avg=r.sum/r.n;if(kg<avg*0.3||kg>avg*3)return `⚠ Peso fuera de lo habitual para "${t}" · promedio de uso ≈ ${Math.round(avg).toLocaleString('es-CL')} kg`;}
-  // 3) contra el rango real del histórico (Excel)
-  const h=CONFIG.tipo_kg&&CONFIG.tipo_kg[t];
-  if(h){
-    if(kg>h.p95*2.5)return `⚠ Peso inusualmente ALTO para "${t}" · normalmente llega hasta ~${h.p95.toLocaleString('es-CL')} kg (histórico de ${h.n} registros)`;
-    if(h.p5>10&&kg<h.p5*0.4)return `⚠ Peso inusualmente BAJO para "${t}" · normalmente parte en ~${h.p5.toLocaleString('es-CL')} kg`;
-  }
-  return '';
+function entReady(){return FDEF().ent.filter(c=>c.req).every(c=>fv(c.k));}
+function lineReady(){
+  const kg=num(fv('kg'));
+  return FDEF().line.filter(c=>c.req&&c.t!=='ro').every(c=>fv(c.k))&&!isNaN(kg)&&kg>0&&kg<=30000;
 }
 function validate(){
-  let errs=[];
-  cols.filter(c=>c.req&&c.t!=='auto').forEach(c=>{
-    const v=eiv(c.k),td=$('td_'+c.k);
-    if(!v){if(td)td.classList.add('c-err');errs.push(c.l);}
-    else if(td)td.classList.remove('c-err');
-  });
-  // límite duro: 30 toneladas (peso máximo de un camión)
-  const kgN=num(eiv('kg'));
-  let hard='';
-  if(!isNaN(kgN)&&kgN>30000){hard='El peso supera 30 toneladas (30.000 kg) — no puede ser más que un camión. Revísalo.';const td=$('td_kg');if(td)td.classList.add('c-err');}
-  const ok=errs.length===0&&!hard;
-  const sb=$('saveBtn');if(sb)sb.disabled=!ok;
-  const wb=$('warnBar');if(wb){
-    const lines=[];
-    if(errs.length)lines.push(`<div class="w-row w-err">✗ Falta: ${errs.join(', ')}</div>`);
-    if(hard)lines.push(`<div class="w-row w-err">⛔ ${hard}</div>`);
-    const dW=dupCheck();if(dW)lines.push(`<div class="w-row w-dup">${dW}</div>`);
-    const sW=sanityCheck();if(sW)lines.push(`<div class="w-row">${sW}</div>`);
-    wb.innerHTML=lines.join('');wb.classList.toggle('show',lines.length>0);
-  }
-  return ok;
+  FDEF().ent.concat(FDEF().line).forEach(c=>{if(c.req){const d=$('rq_'+c.k);if(d)d.classList.toggle('ok',!!fv(c.k));}});
+  const warns=lineChecks();
+  $('lineWarns').innerHTML=warns.map(w=>`<div class="w-row${w.err?' err':''}">${w.m}</div>`).join('');
+  $('addLineBtn').disabled=!lineReady();
+  $('saveBtn').disabled=!(entReady()&&(lines.length>0||lineReady()));
+  $('saveBtn').textContent='Guardar entrega'+(lines.length||lineReady()?' ('+(lines.length+(lineReady()?1:0))+' línea'+((lines.length+(lineReady()?1:0))!==1?'s':'')+')':'');
 }
 
-/* SUGERENCIAS */
+/* líneas */
+function collectLine(){
+  const L={};
+  FDEF().line.concat(FDEF().extra).forEach(c=>{L[c.k]=fv(c.k);});
+  return L;
+}
+function clearLine(){
+  FDEF().line.concat(FDEF().extra).forEach(c=>setF(c.k,''));
+  pesoAuto=true;validate();
+  const ft=$('f_tipo');if(ft)ft.focus();
+}
+function addLine(){
+  if(!lineReady())return;
+  lines.push(collectLine());
+  renderLines();clearLine();
+  toast('Línea añadida ('+lines.length+')');
+}
+function renderLines(){
+  const box=$('linesBox');
+  if(!lines.length){box.innerHTML='<div class="lines-empty">Aún no añades líneas — puedes guardar directo si es un solo material.</div>';validate();return;}
+  box.innerHTML='<table class="lines-table"><thead><tr><th>#</th><th>Tipo</th><th>Material</th><th>Formato</th><th>Vol m³</th><th>KG</th><th>Ton</th><th></th></tr></thead><tbody>'+
+    lines.map((L,i)=>`<tr><td>${i+1}</td><td>${esc(L.tipo)}</td><td>${esc(L.material)||'—'}</td><td>${esc(L.formato)||'—'}</td><td>${esc(L.volumen)||'—'}</td><td class="kg">${fmt(L.kg)}</td><td>${esc(L.ton)||'—'}</td><td><button class="del" data-i="${i}">✕</button></td></tr>`).join('')+
+    '</tbody></table>';
+  box.querySelectorAll('.del').forEach(b=>b.addEventListener('click',()=>{lines.splice(+b.dataset.i,1);renderLines();validate();}));
+  validate();
+}
+
+/* guardar entrega completa */
+function saveAll(){
+  if($('saveBtn').disabled)return;
+  if(lineReady())addLine();               // incluir la línea a medio llenar si está completa
+  if(!lines.length||!entReady())return;
+  const head={};FDEF().ent.forEach(c=>{head[c.k]=fv(c.k);});
+  const f=head.fecha||'';head.mes=f?MESES[parseInt(f.slice(5,7),10)-1]:'';
+  const hora=new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  const saved=[];
+  lines.forEach(L=>{
+    const rec=Object.assign({mode,hora,_sent:false},head,L);
+    recs().unshift(rec);saved.push(rec);
+    audit.unshift({action:'agregado',time:new Date().toISOString(),mode,rec:{fecha:rec.fecha,cliente:rec.cliente||rec.destinatario,material:rec.material,tipo:rec.tipo,kg:rec.kg}});
+    recordLearn(rec);
+  });
+  persist();saveAudit();renderRecs();updKpis();
+  toast('Entrega guardada · '+saved.length+' línea'+(saved.length!==1?'s':''));
+  lines=[];clearAllForm();
+  saved.forEach(sendRec);
+}
+function clearAllForm(){
+  FDEF().ent.concat(FDEF().line,FDEF().extra).forEach(c=>setF(c.k,''));
+  const fe=$('f_fecha');if(fe)fe.value=new Date().toISOString().slice(0,10);
+  $('suggs').classList.remove('show');
+  lines=[];pesoAuto=true;renderLines();validate();
+  const fc=$('f_cliente')||$('f_destinatario');if(fc)fc.focus();
+}
+
+/* aprendizaje / sugerencias */
+function recordLearn(rec){
+  if(rec.patente&&rec.conductor)learn.p2c[rec.patente.toUpperCase()]=rec.conductor;
+  const cK=rec.cliente||rec.destinatario;
+  if(cK&&rec.tipo){if(!learn.c2t[cK])learn.c2t[cK]={};learn.c2t[cK][rec.tipo]=(learn.c2t[cK][rec.tipo]||0)+1;}
+  const kg=Number(rec.kg);
+  if(rec.tipo&&!isNaN(kg)&&kg>0){const r=learn.ranges[rec.tipo]||{min:kg,max:kg,sum:0,n:0};
+    r.min=Math.min(r.min,kg);r.max=Math.max(r.max,kg);r.sum+=kg;r.n++;learn.ranges[rec.tipo]=r;}
+  saveLearn();
+}
 function showSuggs(client){
   const box=$('suggs'),list=$('sList');
-  if(!client){box.classList.remove('show');return;}
-  const map=learn.c2t[client];
+  const map=client&&learn.c2t[client];
   if(!map){box.classList.remove('show');return;}
   const top=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,6);
   if(!top.length){box.classList.remove('show');return;}
   list.innerHTML=top.map(([t,n])=>`<button class="s-chip" data-t="${t.replace(/"/g,'&quot;')}">${esc(t)} <small>${n}×</small></button>`).join('');
-  list.querySelectorAll('.s-chip').forEach(b=>b.addEventListener('click',()=>{const e=$('e_tipo');if(e){e.value=b.dataset.t;updTipo();autoPeso();validate();e.focus();}}));
+  list.querySelectorAll('.s-chip').forEach(b=>b.addEventListener('click',()=>{setF('tipo',b.dataset.t);
+    const t=b.dataset.t,mat=CONFIG.tipo_to_material[t]||'';setF('material',mat);setF('familia',mat?(CONFIG.material_to_familia[mat]||''):'');
+    pesoAuto=true;autoPeso();validate();const e=$('f_volumen')||$('f_kg');if(e)e.focus();}));
   box.classList.add('show');
 }
 
-/* APRENDIZAJE */
-function recordLearn(rec){
-  if(rec.patente&&rec.conductor)learn.p2c[rec.patente]=rec.conductor;
-  const cK=rec.cliente||rec.destinatario;
-  if(cK&&rec.tipo){if(!learn.c2t[cK])learn.c2t[cK]={};learn.c2t[cK][rec.tipo]=(learn.c2t[cK][rec.tipo]||0)+1;}
-  const kg=Number(rec.kg);
-  if(rec.tipo&&!isNaN(kg)&&kg>0){
-    const r=learn.ranges[rec.tipo]||{min:kg,max:kg,sum:0,n:0};
-    r.min=Math.min(r.min,kg);r.max=Math.max(r.max,kg);r.sum+=kg;r.n++;
-    learn.ranges[rec.tipo]=r;
-  }
-  saveLearn();
-}
-
-function collectRow(){
-  const rec={mode,hora:new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}),_sent:false};
-  cols.forEach(c=>{if(c.noSave)return;rec[c.k]=c.t==='auto'?getAuto(c.k):eiv(c.k);});
-  return rec;
-}
-function clearLineFields(){
-  cols.filter(c=>c.line).forEach(c=>{
-    if(c.t==='auto'){setAuto(c.k,'');}
-    else{const e=$('e_'+c.k);if(e)e.value='';}
-  });
-  pesoAuto=true;validate();
-  const ft=$('e_tipo');if(ft)ft.focus();
-}
-function clearAll(){
-  cols.forEach(c=>{
-    if(c.t==='auto')setAuto(c.k,'');
-    else{const e=$('e_'+c.k);if(e)e.value='';}
-  });
-  if($('e_fecha')){$('e_fecha').value=new Date().toISOString().slice(0,10);updMes();}
-  $('suggs').classList.remove('show');pesoAuto=true;validate();
-  const fc=$('e_cliente')||$('e_destinatario');if(fc)fc.focus();
-}
-function saveRow(){
-  if(!validate())return;
-  const rec=collectRow();
-  recs().unshift(rec);persist();renderRecs();
-  audit.unshift({action:'agregado',time:new Date().toISOString(),mode,rec:{fecha:rec.fecha,cliente:rec.cliente||rec.destinatario,material:rec.material,tipo:rec.tipo,kg:rec.kg}});saveAudit();
-  recordLearn(rec);updKpis();
-  toast('Guardado · '+(rec.tipo||rec.material));
-  clearAll();sendRec(rec);
-}
-
+/* registros guardados */
 function renderRecs(){
+  const C=REC_COLS[mode];
   $('recCount').textContent=recs().length+' registro'+(recs().length!==1?'s':'');
   $('expBtn').disabled=recs().length===0;
-  const tb=$('recBody');
-  if(!recs().length){tb.innerHTML='<tr class="empty-row"><td colspan="'+(cols.length+2)+'">Llena la fila amarilla de arriba y pulsa ✓ (o Enter). Muévete entre celdas con Tab o las flechas ← →. Desliza → para ver más columnas.</td></tr>';return;}
-  tb.innerHTML=recs().map((r,i)=>{
-    const cells=cols.map((c,i)=>{
-      const v=r[c.k];
-      const isKgTon=(c.k==='ton'||c.k==='kg');
-      const extra=c.extra?' col-extra':'';
-      const edge=gstartSet.has(i)?' grp-edge':'';
-      const cls=((isKgTon?'net':'')+extra+edge).trim();
-      return `<td${cls?' class="'+cls+'"':''}>${isKgTon?fmt(v):(esc(v)||'—')}</td>`;
-    }).join('');
-    return `<tr class="rec"><td class="col-pin">${i+1}</td>${cells}<td class="c-del-cell"><button class="del" data-i="${i}">✕</button></td></tr>`;
-  }).join('');
+  $('rhead').innerHTML='<tr><th>#</th>'+C.map(c=>'<th>'+c[1]+'</th>').join('')+'<th></th></tr>';
+  const tb=$('rbody');
+  if(!recs().length){tb.innerHTML='<tr><td colspan="'+(C.length+2)+'" class="recs-empty">Sin registros aún.</td></tr>';return;}
+  tb.innerHTML=recs().map((r,i)=>'<tr><td style="color:var(--faint)">'+(i+1)+'</td>'+
+    C.map(c=>{const v=r[c[0]];const isKg=(c[0]==='kg'||c[0]==='ton');return '<td'+(isKg?' class="kg"':'')+'>'+(isKg?fmt(v):(esc(v)||'—'))+'</td>';}).join('')+
+    '<td><button class="del" data-i="'+i+'">✕</button></td></tr>').join('');
   tb.querySelectorAll('.del').forEach(b=>b.addEventListener('click',()=>{
     const idx=+b.dataset.i;const rec=recs()[idx];
-    confirmBox('¿Eliminar este registro?').then(ok=>{
-      if(!ok)return;
-      audit.unshift({action:'eliminado',time:new Date().toISOString(),mode,rec:{fecha:rec.fecha,cliente:rec.cliente||rec.destinatario,material:rec.material,tipo:rec.tipo,kg:rec.kg}});saveAudit();
-      recs().splice(idx,1);persist();renderRecs();updSync();updKpis();
-    });
+    confirmBox('¿Eliminar este registro?').then(ok=>{if(!ok)return;
+      audit.unshift({action:'eliminado',time:new Date().toISOString(),mode,rec:{fecha:rec.fecha,cliente:rec.cliente||rec.destinatario,material:rec.material,tipo:rec.tipo,kg:rec.kg}});
+      saveAudit();recs().splice(idx,1);persist();renderRecs();updKpis();updSync();});
   }));
 }
 function confirmBox(msg){
   return new Promise(res=>{
-    const ov=document.createElement('div');ov.className='modal show';ov.style.zIndex='400';
-    ov.innerHTML='<div class="modal-c" style="max-width:380px"><div class="modal-h"><span>Confirmar</span></div><div style="padding:20px;font-size:13px;color:var(--dark)">'+msg+'</div><div style="display:flex;gap:10px;padding:0 20px 18px;justify-content:flex-end"><button class="btn btn-new" id="_cno">Cancelar</button><button class="btn" id="_cyes" style="background:var(--red);color:#fff">Eliminar</button></div></div>';
+    const ov=document.createElement('div');ov.className='modal show';ov.style.zIndex='500';
+    ov.innerHTML='<div class="modal-c" style="max-width:360px"><div class="modal-h"><span>Confirmar</span></div><div style="padding:20px">'+msg+'</div><div style="display:flex;gap:10px;padding:0 20px 18px;justify-content:flex-end"><button class="btn btn-tool" id="_cn">Cancelar</button><button class="btn" id="_cy" style="background:var(--red);color:#fff">Eliminar</button></div></div>';
     document.body.appendChild(ov);
-    ov.querySelector('#_cno').onclick=()=>{ov.remove();res(false);};
-    ov.querySelector('#_cyes').onclick=()=>{ov.remove();res(true);};
+    ov.querySelector('#_cn').onclick=()=>{ov.remove();res(false);};
+    ov.querySelector('#_cy').onclick=()=>{ov.remove();res(true);};
     ov.onclick=e=>{if(e.target===ov){ov.remove();res(false);}};
   });
 }
@@ -541,29 +491,29 @@ function updKpis(){
   $('kpiCount').textContent=tr.length;
   const totKg=tr.reduce((s,r)=>{const n=Number(r.kg);return isNaN(n)?s:s+n;},0);
   $('kpiTon').textContent=(totKg/1000).toLocaleString('es-CL',{maximumFractionDigits:2});
-  const mCt={},cCt={};
-  tr.forEach(r=>{if(r.material)mCt[r.material]=(mCt[r.material]||0)+1;const c=r.cliente||r.destinatario;if(c)cCt[c]=(cCt[c]||0)+1;});
-  const tM=Object.entries(mCt).sort((a,b)=>b[1]-a[1])[0];
-  const tC=Object.entries(cCt).sort((a,b)=>b[1]-a[1])[0];
-  $('kpiMat').innerHTML=tM?(esc(tM[0])+' <small>'+tM[1]+'×</small>'):'—';
-  $('kpiCli').innerHTML=tC?(esc(tC[0])+' <small>'+tC[1]+'×</small>'):'—';
+  const mC={},cC={};
+  tr.forEach(r=>{if(r.material)mC[r.material]=(mC[r.material]||0)+1;const c=r.cliente||r.destinatario;if(c)cC[c]=(cC[c]||0)+1;});
+  const tM=Object.entries(mC).sort((a,b)=>b[1]-a[1])[0],tC=Object.entries(cC).sort((a,b)=>b[1]-a[1])[0];
+  $('kpiMat').innerHTML=tM?esc(tM[0])+' <small>'+tM[1]+'×</small>':'—';
+  $('kpiCli').innerHTML=tC?esc(tC[0])+' <small>'+tC[1]+'×</small>':'—';
 }
-
 function showHist(){
-  const body=$('histBody');
-  if(!audit.length){body.innerHTML='<div class="h-empty">Sin cambios registrados aún.</div>';}
-  else{body.innerHTML=audit.slice(0,100).map(a=>`<div class="h-row"><span class="h-act h-${a.action}">${a.action}</span><span class="h-time">${new Date(a.time).toLocaleString('es-CL')}</span><span class="h-rec">${esc(a.rec.fecha||'')} · ${esc(a.rec.cliente||'')} · ${esc(a.rec.material||'')} · ${fmt(a.rec.kg)} kg <span style="color:var(--faint)">(${a.mode})</span></span></div>`).join('');}
+  const b=$('histBody');
+  b.innerHTML=audit.length?audit.slice(0,100).map(a=>`<div class="h-row"><span class="h-act h-${a.action}">${a.action}</span><span class="h-time">${new Date(a.time).toLocaleString('es-CL')}</span><span class="h-rec">${esc(a.rec.fecha||'')} · ${esc(a.rec.cliente||'')} · ${esc(a.rec.material||'')} · ${fmt(a.rec.kg)} kg <span style="color:var(--faint)">(${a.mode})</span></span></div>`).join(''):'<div class="h-empty">Sin cambios registrados aún.</div>';
   $('histModal').classList.add('show');
 }
-
 function exportData(){
   const e=mode==='ingreso'?EXP_INGRESO:EXP_SALIDA;
   const cell=v=>{v=(v==null?'':String(v));return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
-  const lines=[e.H.join(';')];recs().slice().reverse().forEach(r=>lines.push(e.K.map(k=>cell(r[k])).join(';')));
-  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  const out=[e.H.join(';')];recs().slice().reverse().forEach(r=>out.push(e.K.map(k=>cell(r[k])).join(';')));
+  const blob=new Blob(['\ufeff'+out.join('\r\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(mode==='ingreso'?'ingresos':'salidas')+'_ecofibras_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
+/* central */
+function persist(){LS.set('eco_'+mode,JSON.stringify(recs()));}
+function saveLearn(){LS.set('eco_learn',JSON.stringify(learn));}
+function saveAudit(){LS.set('eco_audit',JSON.stringify(audit.slice(0,300)));}
 async function sendRec(rec){if(!CENTRAL_URL){updSync();return;}
   try{await fetch(CENTRAL_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(rec)});rec._sent=true;persist();}catch(e){rec._sent=false;}updSync();}
 async function flushPending(){if(!CENTRAL_URL){updSync();return;}
@@ -572,11 +522,38 @@ async function flushPending(){if(!CENTRAL_URL){updSync();return;}
 function updSync(){const el=$('syncStat');if(!el)return;
   if(!CENTRAL_URL){el.style.display='none';return;}
   el.style.display='';
-  const pend=[...store.ingreso,...store.salida].filter(r=>r&&!r._sent).length;
-  el.textContent=pend===0?'● Central al día':'⚠ '+pend+' sin enviar';}
+  const p=[...store.ingreso,...store.salida].filter(r=>r&&!r._sent).length;
+  el.textContent=p===0?'● Central al día':'⚠ '+p+' sin enviar';}
 setInterval(flushPending,20000);
 
-let tt;function toast(m){$('toastMsg').textContent=m;$('toast').classList.add('show');clearTimeout(tt);tt=setTimeout(()=>$('toast').classList.remove('show'),2000);}
-init();
+function setMode(m){
+  mode=m;lines=[];pesoAuto=true;
+  document.querySelectorAll('#modesel button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  buildForm();renderRecs();updKpis();updSync();
+}
+function toggleExtra(){showExtra=!showExtra;
+  document.querySelectorAll('.fx').forEach(el=>el.classList.toggle('hideS',!showExtra));
+  $('extraBtn').textContent=showExtra?'− Facturación':'+ Facturación';}
 
+let tt;function toast(m){$('toastMsg').textContent=m;$('toast').classList.add('show');clearTimeout(tt);tt=setTimeout(()=>$('toast').classList.remove('show'),2200);}
+
+function init(){
+  fillList('dl_cliente',Object.keys(CONFIG.clientes));fillList('dl_destinatario',Object.keys(CONFIG.destinatarios));
+  fillList('dl_transportista',Object.keys(CONFIG.transporte));fillList('dl_generador',CONFIG.generadores);
+  fillList('dl_tipo',Object.keys(CONFIG.tipo_to_material));
+  store.ingreso=loadJSON('eco_ingreso',[]);store.salida=loadJSON('eco_salida',[]);
+  learn=Object.assign({p2c:{},c2t:{},ranges:{}},loadJSON('eco_learn',{}));
+  audit=loadJSON('eco_audit',[]);
+  document.querySelectorAll('#modesel button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+  $('newBtn').addEventListener('click',clearAllForm);
+  $('saveBtn').addEventListener('click',saveAll);
+  $('addLineBtn').addEventListener('click',addLine);
+  $('expBtn').addEventListener('click',exportData);
+  $('extraBtn').addEventListener('click',toggleExtra);
+  $('histBtn').addEventListener('click',showHist);
+  $('histX').addEventListener('click',()=>$('histModal').classList.remove('show'));
+  $('histModal').addEventListener('click',e=>{if(e.target===$('histModal'))$('histModal').classList.remove('show');});
+  setMode('ingreso');flushPending();
+}
+init();
 </script>
